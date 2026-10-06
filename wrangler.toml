@@ -1,0 +1,13 @@
+name = "shadowing-signup"
+main = "src/worker.js"
+compatibility_date = "2026-10-01"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+run_worker_first = ["/api/*"]   # only /api/* runs code; the page itself is static and free
+
+[[d1_databases]]
+binding = "DB"
+database_name = "shadowing-signup"
+database_id = "9cce5c92-2715-432d-a11c-d84632d607ec"

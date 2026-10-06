@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Production KL Team Shadow Sessions</title>
+<meta name="description" content="Select your campus and time slot for a Production KL Team shadow session.">
+<meta name="theme-color" content="#1f5eff">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f6f5f1;--card:#fff;--ink:#1c1b19;--mute:#6b6a65;--line:#e3e1da;--acc:#1f5eff;--accbg:#e8efff;--taken:#efeeea;--ok:#157a4b;--okbg:#e3f4ea}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141413;--card:#1e1e1c;--ink:#f1efe8;--mute:#a09e96;--line:#33322f;--acc:#6b95ff;--accbg:#1d2740;--taken:#272624;--ok:#5fd39a;--okbg:#163326}}
+:root[data-theme="dark"]{--bg:#141413;--card:#1e1e1c;--ink:#f1efe8;--mute:#a09e96;--line:#33322f;--acc:#6b95ff;--accbg:#1d2740;--taken:#272624;--ok:#5fd39a;--okbg:#163326}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*:before,*:after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:1.5rem;margin:0 0 4px}
+.sub{color:var(--mute);margin:0 0 18px}
+.name{display:flex;gap:8px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:20px;position:sticky;top:env(safe-area-inset-top,0px);z-index:2}
+.name label{width:100%;font-size:.85rem;color:var(--mute)}
+.name input{flex:1;min-width:0;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.pick{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.pick label{display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--mute)}
+.pick select{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);width:100%}
+h2{font-size:1.1rem;margin:20px 0 8px}
+.role{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+.role b{display:block;margin-bottom:8px}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.slot{font:inherit;text-align:left;padding:10px 12px;border-radius:10px;border:1px solid var(--acc);background:var(--accbg);color:var(--ink);cursor:pointer;display:flex;flex-direction:column;gap:2px}
+.slot small{color:var(--mute)}
+.slot.taken{border-color:var(--line);background:var(--taken);cursor:not-allowed;color:var(--mute)}
+.slot.mine{border-color:var(--ok);background:var(--okbg);cursor:pointer;color:var(--ink)}
+.slot:disabled:not(.taken){opacity:.6;cursor:not-allowed}
+#msg{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:.9rem;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90%;text-align:center}
+#msg.on{opacity:1}
+#note{background:var(--taken);border-radius:10px;padding:10px 12px;color:var(--mute);margin-bottom:16px;display:none}
+</style>
+</head>
+<body>
+<main>
+  <h1>Production KL Team Shadow Sessions</h1>
+  <p class="sub">Please select your campus and your time slot. Please note that sessions are available on a first come first served basis</p>
+  <div id="note"></div>
+  <div class="name">
+    <label for="nm">Your name</label>
+    <input id="nm" type="text" maxlength="40" placeholder="Enter your name to sign up" autocomplete="name">
+    <div class="pick">
+      <label>Date<select id="dt"></select></label>
+      <label>Campus<select id="cp"></select></label>
+    </div>
+  </div>
+  <div id="list"></div>
+</main>
+<div id="msg" role="status"></div>
+<script>
+const ROLES=["Graphics & Slides","Lyrics & Sermon","Lights","Internal Livestream & Translations"];
+const GROUPS=[
+ {title:"Mandarin",roles:[{n:"Lyrics",t:[""]},{n:"Sermon",t:[""]}]},
+ {title:"Putra",roles:ROLES.map(n=>({n,t:["9 AM","11 AM"]}))},
+ {title:"PJ",roles:ROLES.map(n=>({n,t:["9 AM","11 AM"]}))}
+];
+const DATES=["7th October","14th October"];
+const sid=(d,g,r,t)=>[d,g,r,t].join("-").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/-$/,"");
+const $=id=>document.getElementById(id);
+const nm=$("nm"),dt=$("dt"),cp=$("cp");
+DATES.forEach(d=>dt.add(new Option(d,d)));
+GROUPS.forEach(g=>cp.add(new Option(g.title,g.title)));
+try{const a=localStorage.getItem("shadow-date"),b=localStorage.getItem("shadow-campus");if(DATES.includes(a))dt.value=a;if(GROUPS.some(g=>g.title===b))cp.value=b}catch(e){}
+[dt,cp].forEach(el=>el.addEventListener("change",()=>{try{localStorage.setItem("shadow-date",dt.value);localStorage.setItem("shadow-campus",cp.value)}catch(e){}render()}));
+let claims={},busy=false,loaded=false,offline=false;
+
+// Anonymous per-browser token: lets a volunteer release their own slot.
+let token;
+try{token=localStorage.getItem("shadow-token");if(!token){token=crypto.randomUUID();localStorage.setItem("shadow-token",token)}}
+catch(e){token=token||(crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2)+Date.now().toString(36)+"0000000000")}
+try{nm.value=localStorage.getItem("shadow-name")||""}catch(e){}
+nm.addEventListener("input",()=>{try{localStorage.setItem("shadow-name",nm.value)}catch(e){}});
+
+function toast(t){const m=$("msg");m.textContent=t;m.classList.add("on");clearTimeout(toast.h);toast.h=setTimeout(()=>m.classList.remove("on"),2600)}
+function note(t){const n=$("note");n.textContent=t;n.style.display=t?"block":"none"}
+
+async function api(path,opts={}){
+  const r=await fetch("/api/"+path,{...opts,headers:{"content-type":"application/json","x-token":token}});
+  let d={};try{d=await r.json()}catch(e){}
+  return {status:r.status,data:d};
+}
+
+function render(){
+  const root=$("list");root.textContent="";
+  GROUPS.filter(g=>g.title===cp.value).forEach(g=>{
+    const h=document.createElement("h2");h.textContent=g.title+" · "+dt.value;root.appendChild(h);
+    g.roles.forEach(r=>{
+      const card=document.createElement("div");card.className="role";
+      const b=document.createElement("b");b.textContent=r.n;card.appendChild(b);
+      const o=document.createElement("div");o.className="opts";
+      r.t.forEach(t=>{
+        const id=sid(dt.value,g.title,r.n,t),c=claims[id];
+        const btn=document.createElement("button");btn.className="slot";btn.type="button";
+        const top=document.createElement("span");top.textContent=t||"Available";
+        const sub=document.createElement("small");
+        if(c){
+          btn.classList.add(c.mine?"mine":"taken");
+          sub.textContent=c.mine?"Yours · tap to release":"Taken by "+(c.name||"someone");
+          if(c.mine)btn.onclick=()=>release(id);else btn.disabled=true;
+        }else{
+          sub.textContent=loaded?"Open · tap to claim":"Loading…";
+          btn.disabled=!loaded;
+          btn.onclick=()=>claim(id);
+        }
+        btn.append(top,sub);o.appendChild(btn);
+      });
+      card.appendChild(o);root.appendChild(card);
+    });
+  });
+}
+
+async function refresh(){
+  try{
+    const {status,data}=await api("slots");
+    if(status!==200)throw 0;
+    claims=data.claims||{};loaded=true;
+    if(offline){offline=false;note("")}
+  }catch(e){offline=true;note("Can't reach the server. Retrying…")}
+  render();
+}
+
+async function claim(id){
+  const name=nm.value.trim();
+  if(!name){toast("Enter your name first");nm.focus();return}
+  if(busy)return;busy=true;
+  try{
+    const {status}=await api("claim",{method:"POST",body:JSON.stringify({id,name})});
+    if(status===200)toast("You're signed up!");
+    else if(status===409)toast("Sorry, that slot was just taken.");
+    else toast("Couldn't sign up. Please try again.");
+  }catch(e){toast("Couldn't sign up. Check your connection.")}
+  finally{busy=false;refresh()}
+}
+async function release(id){
+  if(busy||!confirm("Release this slot so someone else can take it?"))return;busy=true;
+  try{
+    const {status}=await api("release",{method:"POST",body:JSON.stringify({id})});
+    toast(status===200?"Slot released":"Couldn't release the slot.");
+  }catch(e){toast("Couldn't release. Check your connection.")}
+  finally{busy=false;refresh()}
+}
+
+render();refresh();
+setInterval(()=>{if(!document.hidden)refresh()},15000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)refresh()});
+</script>
+</body>
+</html>
