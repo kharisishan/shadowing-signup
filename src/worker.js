@@ -23,6 +23,7 @@ async function handleApi(request, env) {
     if (!db) return json({ error: "no_database_binding" }, 500);
 
     const route = new URL(request.url).pathname.replace(/^\/api\/?/, "");
+    const token = request.headers.get("x-token") || "";
     if (request.method === "GET" && route === "admin-check") return json({ adminKeySet: !!env.ADMIN_KEY });
 
     if (request.method === "GET" && route === "slots") {
