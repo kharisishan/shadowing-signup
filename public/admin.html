@@ -1,84 +1,123 @@
-Shadow Sessions Admin
-Admin key
-Copy sign-ups
-Refresh
-0 of 36 slots taken
-7th October · Mandarin
-Lyrics
-Open
-Sermon
-Open
-7th October · Putra
-Graphics & Slides · 9 AM
-Open
-Graphics & Slides · 11 AM
-Open
-Lyrics & Sermon · 9 AM
-Open
-Lyrics & Sermon · 11 AM
-Open
-Lights · 9 AM
-Open
-Lights · 11 AM
-Open
-Internal Livestream & Translations · 9 AM
-Open
-Internal Livestream & Translations · 11 AM
-Open
-7th October · PJ
-Graphics & Slides · 9 AM
-Open
-Graphics & Slides · 11 AM
-Open
-Lyrics & Sermon · 9 AM
-Open
-Lyrics & Sermon · 11 AM
-Open
-Lights · 9 AM
-Open
-Lights · 11 AM
-Open
-Internal Livestream & Translations · 9 AM
-Open
-Internal Livestream & Translations · 11 AM
-Open
-14th October · Mandarin
-Lyrics
-Open
-Sermon
-Open
-14th October · Putra
-Graphics & Slides · 9 AM
-Open
-Graphics & Slides · 11 AM
-Open
-Lyrics & Sermon · 9 AM
-Open
-Lyrics & Sermon · 11 AM
-Open
-Lights · 9 AM
-Open
-Lights · 11 AM
-Open
-Internal Livestream & Translations · 9 AM
-Open
-Internal Livestream & Translations · 11 AM
-Open
-14th October · PJ
-Graphics & Slides · 9 AM
-Open
-Graphics & Slides · 11 AM
-Open
-Lyrics & Sermon · 9 AM
-Open
-Lyrics & Sermon · 11 AM
-Open
-Lights · 9 AM
-Open
-Lights · 11 AM
-Open
-Internal Livestream & Translations · 9 AM
-Open
-Internal Livestream & Translations · 11 AM
-Open
-Can't reach the server
+
+
+Admin · HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Shadow Sessions Admin</title>
+<style>
+:root{box-sizing:border-box;--bg:#f6f5f1;--card:#fff;--ink:#1c1b19;--mute:#6b6a65;--line:#e3e1da;--acc:#1f5eff;--bad:#c0392b;--ok:#157a4b}
+@media (prefers-color-scheme:dark){:root{--bg:#141413;--card:#1e1e1c;--ink:#f1efe8;--mute:#a09e96;--line:#33322f;--acc:#6b95ff;--bad:#ff7b6b;--ok:#5fd39a}}
+*,*:before,*:after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:1.4rem;margin:0 0 12px}
+h2{font-size:1.05rem;margin:22px 0 8px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
+input,button,select{font:inherit;padding:9px 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+input{flex:1;min-width:160px}
+button{cursor:pointer;background:var(--acc);color:#fff;border-color:var(--acc)}
+button.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+button.rel{background:transparent;color:var(--bad);border-color:var(--bad);padding:5px 10px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 12px;background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:6px}
+.row small{color:var(--mute);display:block}
+.open{color:var(--mute)}
+.who{font-weight:600;color:var(--ok)}
+#msg{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;opacity:0;transition:opacity .2s;pointer-events:none}
+#msg.on{opacity:1}
+.count{color:var(--mute);font-size:.9rem}
+</style>
+</head>
+<body>
+<main>
+  <h1>Shadow Sessions Admin</h1>
+  <div class="bar">
+    <input id="key" type="password" placeholder="Admin key" autocomplete="off">
+    <button class="ghost" id="copy" type="button">Copy sign-ups</button>
+    <button class="ghost" id="reload" type="button">Refresh</button>
+  </div>
+  <div class="count" id="count"></div>
+  <div id="list"></div>
+</main>
+<div id="msg" role="status"></div>
+<script>
+const ROLES=["Graphics & Slides","Lyrics & Sermon","Lights","Internal Livestream & Translations"];
+const GROUPS=[
+ {title:"Mandarin",roles:[{n:"Lyrics",t:[""]},{n:"Sermon",t:[""]}]},
+ {title:"Putra",roles:ROLES.map(n=>({n,t:["9 AM","11 AM"]}))},
+ {title:"PJ",roles:ROLES.map(n=>({n,t:["9 AM","11 AM"]}))}
+];
+const DATES=["7th October","14th October"];
+const sid=(d,g,r,t)=>[d,g,r,t].join("-").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/-$/,"");
+const $=id=>document.getElementById(id);
+let claims={};
+function toast(t){const m=$("msg");m.textContent=t;m.classList.add("on");clearTimeout(toast.h);toast.h=setTimeout(()=>m.classList.remove("on"),2600)}
+ 
+async function load(){
+  try{
+    const r=await fetch("/api/slots",{headers:{"x-token":"admin"}});
+    if(!r.ok)throw 0;
+    claims=(await r.json()).claims||{};
+  }catch(e){toast("Can't reach the server")}
+  render();
+}
+ 
+function render(){
+  const root=$("list");root.textContent="";
+  let taken=0,total=0;
+  DATES.forEach(d=>GROUPS.forEach(g=>{
+    const h=document.createElement("h2");h.textContent=d+" · "+g.title;root.appendChild(h);
+    g.roles.forEach(r=>r.t.forEach(t=>{
+      const id=sid(d,g.title,r.n,t),c=claims[id];total++;
+      const row=document.createElement("div");row.className="row";
+      const left=document.createElement("div");
+      const a=document.createElement("div");a.textContent=r.n+(t?" · "+t:"");
+      const b=document.createElement("small");
+      if(c){taken++;b.className="who";b.textContent=c.name}else{b.className="open";b.textContent="Open"}
+      left.append(a,b);row.appendChild(left);
+      if(c){const btn=document.createElement("button");btn.className="rel";btn.type="button";btn.textContent="Release";btn.onclick=()=>release(id,c.name);row.appendChild(btn)}
+      root.appendChild(row);
+    }));
+  }));
+  $("count").textContent=taken+" of "+total+" slots taken";
+}
+ 
+async function release(id,name){
+  const k=$("key").value.trim();
+  if(!k){toast("Enter the admin key first");$("key").focus();return}
+  if(!confirm("Release "+name+"'s slot?"))return;
+  try{
+    const r=await fetch("/api/release",{method:"POST",headers:{"content-type":"application/json","x-token":"admin"},body:JSON.stringify({id,adminKey:k})});
+    toast(r.status===200?"Slot released":r.status===403?"Wrong admin key":"Couldn't release");
+  }catch(e){toast("Couldn't release. Check your connection.")}
+  load();
+}
+ 
+function summary(){
+  const out=[];
+  DATES.forEach(d=>GROUPS.forEach(g=>{
+    const lines=[];
+    g.roles.forEach(r=>r.t.forEach(t=>{const c=claims[sid(d,g.title,r.n,t)];if(c)lines.push("  "+r.n+(t?" ("+t+")":"")+": "+c.name)}));
+    if(lines.length)out.push(d+" · "+g.title,...lines);
+  }));
+  return out.join("\n")||"No sign-ups yet.";
+}
+$("copy").onclick=async()=>{try{await navigator.clipboard.writeText(summary());toast("Copied")}catch(e){toast("Couldn't copy")}};
+$("reload").onclick=load;
+load();setInterval(()=>{if(!document.hidden)load()},15000);
+</script>
+</body>
+</html>
+ 
+
+
+
+
+
+
+
+
+
