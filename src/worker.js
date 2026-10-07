@@ -17,7 +17,7 @@ const GROUPS=[
   day("21st October (GPN)",mk(["Lyrics & Sermon","Lights"],["6 PM"])),
   day("25th October (Sunday)",mk(["Lyrics","Sermon","Lights"],["2 PM"]))]},
  {title:"Putra",days:[sunday("11th October"),sunday("18th October"),gpn("21st October"),sunday("25th October")]},
- {title:"PJ",days:[sunday("11th October"),sunday("18th October"),gpn("21st October"),sunday("25th October")]}
+ {title:"PJ",days:[day("11th October (Sunday)",[...mk(["Graphics & Slides"],["9 AM","11 AM"]),...mk(["Lyrics & Sermon"],["9 AM"]),...mk(["Lights","Internal Livestream & Translations"],["9 AM","11 AM"])]),sunday("18th October"),gpn("21st October"),sunday("25th October")]}
 ];
 const sid = (d, g, r, t) => [d.replace(/\s*\(.*\)\s*$/, ""), g, r, t].join("-").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-$/, "");
 const IDS = new Set(GROUPS.flatMap(g => g.days.flatMap(x => x.roles.flatMap(r => r.t.map(t => sid(x.d, g.title, r.n, t))))));
