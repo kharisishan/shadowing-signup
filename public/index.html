@@ -70,7 +70,7 @@ const GROUPS=[
   day("21st October (GPN)",mk(["Lyrics & Sermon","Lights"],["6 PM"])),
   day("25th October (Sunday)",mk(["Lyrics","Sermon","Lights"],["2 PM"]))]},
  {title:"Putra",days:[sunday("11th October"),sunday("18th October"),gpn("21st October"),sunday("25th October")]},
- {title:"PJ",days:[sunday("11th October"),sunday("18th October"),gpn("21st October"),sunday("25th October")]}
+ {title:"PJ",days:[day("11th October (Sunday)",[...mk(["Graphics & Slides"],["9 AM","11 AM"]),...mk(["Lyrics & Sermon"],["9 AM"]),...mk(["Lights","Internal Livestream & Translations"],["9 AM","11 AM"])]),sunday("18th October"),gpn("21st October"),sunday("25th October")]}
 ];
 const sid=(d,g,r,t)=>[d.replace(/\s*\(.*\)\s*$/,""),g,r,t].join("-").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/-$/,"");
 const $=id=>document.getElementById(id);
@@ -84,23 +84,23 @@ try{const a=localStorage.getItem("shadow-date");if([...dt.options].some(o=>o.val
 cp.addEventListener("change",()=>{fillDate();saveSel();render()});
 dt.addEventListener("change",()=>{saveSel();render()});
 let claims={},busy=false,loaded=false,offline=false;
- 
+
 // Anonymous per-browser token: lets a volunteer release their own slot.
 let token;
 try{token=localStorage.getItem("shadow-token");if(!token){token=crypto.randomUUID();localStorage.setItem("shadow-token",token)}}
 catch(e){token=token||(crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2)+Date.now().toString(36)+"0000000000")}
 try{nm.value=localStorage.getItem("shadow-name")||""}catch(e){}
 nm.addEventListener("input",()=>{try{localStorage.setItem("shadow-name",nm.value)}catch(e){}});
- 
+
 function toast(t){const m=$("msg");m.textContent=t;m.classList.add("on");clearTimeout(toast.h);toast.h=setTimeout(()=>m.classList.remove("on"),2600)}
 function note(t){const n=$("note");n.textContent=t;n.style.display=t?"block":"none"}
- 
+
 async function api(path,opts={}){
   const r=await fetch("/api/"+path,{...opts,headers:{"content-type":"application/json","x-token":token}});
   let d={};try{d=await r.json()}catch(e){}
   return {status:r.status,data:d};
 }
- 
+
 function render(){
   const root=$("list");root.textContent="";
   GROUPS.filter(g=>g.title===cp.value).forEach(g=>{const day=g.days.find(x=>x.d===dt.value);if(!day)return;
@@ -129,7 +129,7 @@ function render(){
     });
   });
 }
- 
+
 async function refresh(){
   try{
     const {status,data}=await api("slots");
@@ -139,7 +139,7 @@ async function refresh(){
   }catch(e){offline=true;note("Can't reach the server. Retrying…")}
   render();
 }
- 
+
 async function claim(id){
   const name=nm.value.trim();
   if(!name){toast("Enter your name first");nm.focus();return}
@@ -160,20 +160,10 @@ async function release(id){
   }catch(e){toast("Couldn't release. Check your connection.")}
   finally{busy=false;refresh()}
 }
- 
+
 render();refresh();
 setInterval(()=>{if(!document.hidden)refresh()},15000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)refresh()});
 </script>
 </body>
 </html>
- 
-
-
-
-
-
-
-
-
-
