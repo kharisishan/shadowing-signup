@@ -57,13 +57,13 @@ const GROUPS=[
   day("21st October (GPN)",mk(["Lyrics & Sermon","Lights"],["6 PM"])),
   day("25th October (Sunday)",mk(["Lyrics","Sermon","Lights"],["2 PM"]))]},
  {title:"Putra",days:[sunday("11th October"),sunday("18th October"),gpn("21st October"),sunday("25th October")]},
- {title:"PJ",days:[sunday("11th October"),sunday("18th October"),gpn("21st October"),sunday("25th October")]}
+ {title:"PJ",days:[day("11th October (Sunday)",[...mk(["Graphics & Slides"],["9 AM","11 AM"]),...mk(["Lyrics & Sermon"],["9 AM"]),...mk(["Lights","Internal Livestream & Translations"],["9 AM","11 AM"])]),sunday("18th October"),gpn("21st October"),sunday("25th October")]}
 ];
 const sid=(d,g,r,t)=>[d.replace(/\s*\(.*\)\s*$/,""),g,r,t].join("-").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/-$/,"");
 const $=id=>document.getElementById(id);
 let claims={};
 function toast(t){const m=$("msg");m.textContent=t;m.classList.add("on");clearTimeout(toast.h);toast.h=setTimeout(()=>m.classList.remove("on"),2600)}
- 
+
 async function load(){
   try{
     const r=await fetch("/api/slots",{headers:{"x-token":"admin"}});
@@ -72,7 +72,7 @@ async function load(){
   }catch(e){toast("Can't reach the server")}
   render();
 }
- 
+
 function render(){
   const root=$("list");root.textContent="";
   let taken=0,total=0;
@@ -92,7 +92,7 @@ function render(){
   }));
   $("count").textContent=taken+" of "+total+" slots taken";
 }
- 
+
 async function release(id,name){
   const k=$("key").value.trim();
   if(!k){toast("Enter the admin key first");$("key").focus();return}
@@ -103,7 +103,7 @@ async function release(id,name){
   }catch(e){toast("Couldn't release. Check your connection.")}
   load();
 }
- 
+
 function summary(){
   const out=[];
   GROUPS.forEach(g=>g.days.forEach(dy=>{const d=dy.d;
@@ -119,13 +119,3 @@ load();setInterval(()=>{if(!document.hidden)load()},15000);
 </script>
 </body>
 </html>
- 
-
-
-
-
-
-
-
-
-
