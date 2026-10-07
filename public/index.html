@@ -1,3 +1,28 @@
+
+/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Index · HTML
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,51 +71,66 @@ h2{font-size:1.1rem;margin:20px 0 8px}
     <label for="nm">Your name</label>
     <input id="nm" type="text" maxlength="40" placeholder="Enter your name to sign up" autocomplete="name">
     <div class="pick">
-      <label>Date<select id="dt"></select></label>
       <label>Campus<select id="cp"></select></label>
+      <label>Date<select id="dt"></select></label>
     </div>
   </div>
   <div id="list"></div>
 </main>
 <div id="msg" role="status"></div>
 <script>
-const ROLES=["Graphics & Slides","Lyrics & Sermon","Lights","Internal Livestream & Translations"];
+const FOUR=["Graphics & Slides","Lyrics & Sermon","Lights","Internal Livestream & Translations"];
+const mk=(names,times)=>names.map(n=>({n,t:times}));
+const day=(d,roles)=>({d,roles});
+// A Sunday at Putra/PJ: all four roles at 9 AM and 11 AM. A GPN: all four roles at 6 PM.
+const sunday=d=>day(d+" (Sunday)",mk(FOUR,["9 AM","11 AM"]));
+const gpn=d=>day(d+" (GPN)",mk(FOUR,["6 PM"]));
 const GROUPS=[
- {title:"Mandarin",roles:[{n:"Lyrics",t:[""]},{n:"Sermon",t:[""]}]},
- {title:"Putra",roles:ROLES.map(n=>({n,t:["9 AM","11 AM"]}))},
- {title:"PJ",roles:ROLES.map(n=>({n,t:["9 AM","11 AM"]}))}
+ {title:"Subang",days:[
+  day("21st October (GPN)",mk(["Lights"],["6 PM"])),
+  day("25th October (Sunday)",mk(["Lyrics","Sermon","Lyrics (Side Screens)","Lights"],["5 PM"]))]},
+ {title:"Mandarin",days:[
+  day("11th October (Sunday)",mk(["Lyrics","Sermon","Lights"],["2 PM"])),
+  day("18th October (Sunday)",mk(["Lyrics","Sermon","Lights"],["2 PM"])),
+  day("21st October (GPN)",mk(["Lyrics & Sermon","Lights"],["6 PM"])),
+  day("25th October (Sunday)",mk(["Lyrics","Sermon","Lights"],["2 PM"]))]},
+ {title:"Putra",days:[sunday("11th October"),sunday("18th October"),gpn("21st October"),sunday("25th October")]},
+ {title:"PJ",days:[sunday("11th October"),sunday("18th October"),gpn("21st October"),sunday("25th October")]}
 ];
-const DATES=["7th October","14th October"];
-const sid=(d,g,r,t)=>[d,g,r,t].join("-").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/-$/,"");
+const sid=(d,g,r,t)=>[d.replace(/\s*\(.*\)\s*$/,""),g,r,t].join("-").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/-$/,"");
 const $=id=>document.getElementById(id);
 const nm=$("nm"),dt=$("dt"),cp=$("cp");
-DATES.forEach(d=>dt.add(new Option(d,d)));
 GROUPS.forEach(g=>cp.add(new Option(g.title,g.title)));
-try{const a=localStorage.getItem("shadow-date"),b=localStorage.getItem("shadow-campus");if(DATES.includes(a))dt.value=a;if(GROUPS.some(g=>g.title===b))cp.value=b}catch(e){}
-[dt,cp].forEach(el=>el.addEventListener("change",()=>{try{localStorage.setItem("shadow-date",dt.value);localStorage.setItem("shadow-campus",cp.value)}catch(e){}render()}));
+function fillDate(){const prev=dt.value;dt.textContent="";const g=GROUPS.find(x=>x.title===cp.value);(g?g.days:[]).forEach(x=>dt.add(new Option(x.d,x.d)));if([...dt.options].some(o=>o.value===prev))dt.value=prev}
+function saveSel(){try{localStorage.setItem("shadow-date",dt.value);localStorage.setItem("shadow-campus",cp.value)}catch(e){}}
+try{const b=localStorage.getItem("shadow-campus");if(GROUPS.some(g=>g.title===b))cp.value=b}catch(e){}
+fillDate();
+try{const a=localStorage.getItem("shadow-date");if([...dt.options].some(o=>o.value===a))dt.value=a}catch(e){}
+cp.addEventListener("change",()=>{fillDate();saveSel();render()});
+dt.addEventListener("change",()=>{saveSel();render()});
 let claims={},busy=false,loaded=false,offline=false;
-
+ 
 // Anonymous per-browser token: lets a volunteer release their own slot.
 let token;
 try{token=localStorage.getItem("shadow-token");if(!token){token=crypto.randomUUID();localStorage.setItem("shadow-token",token)}}
 catch(e){token=token||(crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2)+Date.now().toString(36)+"0000000000")}
 try{nm.value=localStorage.getItem("shadow-name")||""}catch(e){}
 nm.addEventListener("input",()=>{try{localStorage.setItem("shadow-name",nm.value)}catch(e){}});
-
+ 
 function toast(t){const m=$("msg");m.textContent=t;m.classList.add("on");clearTimeout(toast.h);toast.h=setTimeout(()=>m.classList.remove("on"),2600)}
 function note(t){const n=$("note");n.textContent=t;n.style.display=t?"block":"none"}
-
+ 
 async function api(path,opts={}){
   const r=await fetch("/api/"+path,{...opts,headers:{"content-type":"application/json","x-token":token}});
   let d={};try{d=await r.json()}catch(e){}
   return {status:r.status,data:d};
 }
-
+ 
 function render(){
   const root=$("list");root.textContent="";
-  GROUPS.filter(g=>g.title===cp.value).forEach(g=>{
+  GROUPS.filter(g=>g.title===cp.value).forEach(g=>{const day=g.days.find(x=>x.d===dt.value);if(!day)return;
     const h=document.createElement("h2");h.textContent=g.title+" · "+dt.value;root.appendChild(h);
-    g.roles.forEach(r=>{
+    day.roles.forEach(r=>{
       const card=document.createElement("div");card.className="role";
       const b=document.createElement("b");b.textContent=r.n;card.appendChild(b);
       const o=document.createElement("div");o.className="opts";
@@ -114,7 +154,7 @@ function render(){
     });
   });
 }
-
+ 
 async function refresh(){
   try{
     const {status,data}=await api("slots");
@@ -124,7 +164,7 @@ async function refresh(){
   }catch(e){offline=true;note("Can't reach the server. Retrying…")}
   render();
 }
-
+ 
 async function claim(id){
   const name=nm.value.trim();
   if(!name){toast("Enter your name first");nm.focus();return}
@@ -145,10 +185,20 @@ async function release(id){
   }catch(e){toast("Couldn't release. Check your connection.")}
   finally{busy=false;refresh()}
 }
-
+ 
 render();refresh();
 setInterval(()=>{if(!document.hidden)refresh()},15000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)refresh()});
 </script>
 </body>
 </html>
+ 
+
+
+
+
+
+
+
+
+
