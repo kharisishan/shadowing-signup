@@ -1,15 +1,26 @@
 // Cloudflare Worker: handles /api/slots, /api/claim, /api/release; everything else is served from ./public
 // Storage: D1 (binding "DB"). Optional secret: ADMIN_KEY.
 
-const ROLES = ["Graphics & Slides", "Lyrics & Sermon", "Lights", "Internal Livestream & Translations"];
-const GROUPS = [
-  { title: "Mandarin", roles: [{ n: "Lyrics", t: [""] }, { n: "Sermon", t: [""] }] },
-  { title: "Putra", roles: ROLES.map(n => ({ n, t: ["9 AM", "11 AM"] })) },
-  { title: "PJ", roles: ROLES.map(n => ({ n, t: ["9 AM", "11 AM"] })) },
+const FOUR = ["Graphics & Slides","Lyrics & Sermon","Lights","Internal Livestream & Translations"];
+const mk=(names,times)=>names.map(n=>({n,t:times}));
+const day=(d,roles)=>({d,roles});
+// A Sunday at Putra/PJ: all four roles at 9 AM and 11 AM. A GPN: all four roles at 6 PM.
+const sunday=d=>day(d+" (Sunday)",mk(FOUR,["9 AM","11 AM"]));
+const gpn=d=>day(d+" (GPN)",mk(FOUR,["6 PM"]));
+const GROUPS=[
+ {title:"Subang",days:[
+  day("21st October (GPN)",mk(["Lights"],["6 PM"])),
+  day("25th October (Sunday)",mk(["Lyrics","Sermon","Lyrics (Side Screens)","Lights"],["5 PM"]))]},
+ {title:"Mandarin",days:[
+  day("11th October (Sunday)",mk(["Lyrics","Sermon","Lights"],["2 PM"])),
+  day("18th October (Sunday)",mk(["Lyrics","Sermon","Lights"],["2 PM"])),
+  day("21st October (GPN)",mk(["Lyrics & Sermon","Lights"],["6 PM"])),
+  day("25th October (Sunday)",mk(["Lyrics","Sermon","Lights"],["2 PM"]))]},
+ {title:"Putra",days:[sunday("11th October"),sunday("18th October"),gpn("21st October"),sunday("25th October")]},
+ {title:"PJ",days:[sunday("11th October"),sunday("18th October"),gpn("21st October"),sunday("25th October")]}
 ];
-const DATES = ["7th October", "14th October"];
-const sid = (d, g, r, t) => [d, g, r, t].join("-").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-$/, "");
-const IDS = new Set(DATES.flatMap(d => GROUPS.flatMap(g => g.roles.flatMap(r => r.t.map(t => sid(d, g.title, r.n, t))))));
+const sid = (d, g, r, t) => [d.replace(/\s*\(.*\)\s*$/, ""), g, r, t].join("-").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-$/, "");
+const IDS = new Set(GROUPS.flatMap(g => g.days.flatMap(x => x.roles.flatMap(r => r.t.map(t => sid(x.d, g.title, r.n, t))))));
 
 const json = (o, s = 200) =>
   new Response(JSON.stringify(o), {
