@@ -1,3 +1,28 @@
+Claude
+/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Admin · HTML
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,29 +66,22 @@ button.rel{background:transparent;color:var(--bad);border-color:var(--bad);paddi
 </main>
 <div id="msg" role="status"></div>
 <script>
-const FOUR=["Graphics & Slides","Lyrics & Sermon","Lights","Internal Livestream & Translations"];
+const FOUR=["Mac 1 Graphics & Slides","Mac 2 Lyrics & Sermon","Lights","Internal Livestream & Translations"];
 const mk=(names,times)=>names.map(n=>({n,t:times}));
 const day=(d,roles)=>({d,roles});
-// A Sunday at Putra/PJ: all four roles at 9 AM and 11 AM. A GPN: all four roles at 6 PM.
-const sunday=d=>day(d+" (Sunday)",mk(FOUR,["9 AM","11 AM"]));
-const gpn=d=>day(d+" (GPN)",mk(FOUR,["6 PM"]));
+// Putra/PJ: all four roles at 9 AM and 11 AM
+const std=d=>day(d,mk(FOUR,["9 AM","11 AM"]));
 const GROUPS=[
- {title:"Subang",days:[
-  day("21st October (GPN)",mk(["Lights"],["6 PM"])),
-  day("25th October (Sunday)",mk(["Lyrics","Sermon","Lyrics (Side Screens)","Lights"],["5 PM"]))]},
- {title:"Mandarin",days:[
-  day("11th October (Sunday)",mk(["Lyrics","Sermon","Lights"],["2 PM"])),
-  day("18th October (Sunday)",mk(["Lyrics","Sermon","Lights"],["2 PM"])),
-  day("21st October (GPN)",mk(["Lyrics & Sermon","Lights"],["6 PM"])),
-  day("25th October (Sunday)",mk(["Lyrics","Sermon","Lights"],["2 PM"]))]},
- {title:"Putra",days:[sunday("11th October"),sunday("18th October"),gpn("21st October"),sunday("25th October")]},
- {title:"PJ",days:[day("11th October (Sunday)",[...mk(["Graphics & Slides"],["9 AM","11 AM"]),...mk(["Lyrics & Sermon"],["9 AM"]),...mk(["Lights","Internal Livestream & Translations"],["9 AM","11 AM"])]),sunday("18th October"),gpn("21st October"),sunday("25th October")]}
+ {title:"Subang",days:["1st November","15th November"].map(d=>day(d,mk(["Lyrics","Sermon","Lyrics (Side Screens)","Lights"],["5 PM"])))},
+ {title:"Mandarin",days:["1st November","8th November","15th November"].map(d=>day(d,mk(["Lyrics","Sermon","Lights"],["2 PM"])))},
+ {title:"Putra",days:["1st November","8th November","15th November","22nd November"].map(std)},
+ {title:"PJ",days:["1st November","8th November","22nd November"].map(std)}
 ];
 const sid=(d,g,r,t)=>[d.replace(/\s*\(.*\)\s*$/,""),g,r,t].join("-").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/-$/,"");
 const $=id=>document.getElementById(id);
 let claims={};
 function toast(t){const m=$("msg");m.textContent=t;m.classList.add("on");clearTimeout(toast.h);toast.h=setTimeout(()=>m.classList.remove("on"),2600)}
-
+ 
 async function load(){
   try{
     const r=await fetch("/api/slots",{headers:{"x-token":"admin"}});
@@ -72,7 +90,7 @@ async function load(){
   }catch(e){toast("Can't reach the server")}
   render();
 }
-
+ 
 function render(){
   const root=$("list");root.textContent="";
   let taken=0,total=0;
@@ -92,7 +110,7 @@ function render(){
   }));
   $("count").textContent=taken+" of "+total+" slots taken";
 }
-
+ 
 async function release(id,name){
   const k=$("key").value.trim();
   if(!k){toast("Enter the admin key first");$("key").focus();return}
@@ -103,7 +121,7 @@ async function release(id,name){
   }catch(e){toast("Couldn't release. Check your connection.")}
   load();
 }
-
+ 
 function summary(){
   const out=[];
   GROUPS.forEach(g=>g.days.forEach(dy=>{const d=dy.d;
@@ -119,3 +137,5 @@ load();setInterval(()=>{if(!document.hidden)load()},15000);
 </script>
 </body>
 </html>
+ 
+Claude finished the response
