@@ -6,38 +6,85 @@
 <meta name="robots" content="noindex,nofollow">
 <title>Shadow Sessions Admin</title>
 <style>
-:root{box-sizing:border-box;--bg:#f6f5f1;--card:#fff;--ink:#1c1b19;--mute:#6b6a65;--line:#e3e1da;--acc:#1f5eff;--bad:#c0392b;--ok:#157a4b}
-@media (prefers-color-scheme:dark){:root{--bg:#141413;--card:#1e1e1c;--ink:#f1efe8;--mute:#a09e96;--line:#33322f;--acc:#6b95ff;--bad:#ff7b6b;--ok:#5fd39a}}
+:root{box-sizing:border-box;--bg:#f6f5f1;--card:#fff;--ink:#1c1b19;--mute:#6b6a65;--line:#e3e1da;--acc:#1f5eff;--accbg:#e8efff;--bad:#c0392b;--ok:#157a4b;--warn:#b26a00}
+@media (prefers-color-scheme:dark){:root{--bg:#141413;--card:#1e1e1c;--ink:#f1efe8;--mute:#a09e96;--line:#33322f;--acc:#6b95ff;--accbg:#1d2740;--bad:#ff7b6b;--ok:#5fd39a;--warn:#f0b35a}}
 *,*:before,*:after{box-sizing:inherit}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-main{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+main{max-width:820px;margin:0 auto;padding:20px 16px 56px}
 h1{font-size:1.4rem;margin:0 0 12px}
-h2{font-size:1.05rem;margin:22px 0 8px}
-.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
+h2{font-size:1.02rem;margin:20px 0 8px;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+h2 small{font-weight:400;color:var(--mute);font-size:.85rem}
+h2 small.warn{color:var(--warn)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
 input,button,select{font:inherit;padding:9px 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
-input{flex:1;min-width:160px}
+input{flex:1;min-width:150px}
+select{flex:1;min-width:130px}
 button{cursor:pointer;background:var(--acc);color:#fff;border-color:var(--acc)}
 button.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
-button.rel{background:transparent;color:var(--bad);border-color:var(--bad);padding:5px 10px}
+button.sm{padding:5px 10px;font-size:.9rem}
+button.rel{background:transparent;color:var(--bad);border-color:var(--bad)}
+button.add{background:transparent;color:var(--acc);border-color:var(--acc)}
+.tabs{display:flex;gap:6px;margin-bottom:10px}
+.tabs button{background:transparent;color:var(--ink);border-color:var(--line)}
+.tabs button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.chip{background:var(--card);border:1px solid var(--line);color:var(--ink);padding:6px 10px;border-radius:999px;font-size:.88rem;cursor:pointer}
+.chip.on{background:var(--accbg);border-color:var(--acc)}
+.chip b{font-weight:600}
 .row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 12px;background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:6px}
 .row small{color:var(--mute);display:block}
+.row .btns{display:flex;gap:6px;flex-shrink:0}
 .open{color:var(--mute)}
 .who{font-weight:600;color:var(--ok)}
-#msg{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;opacity:0;transition:opacity .2s;pointer-events:none}
+.feed .row{align-items:flex-start}
+.feed .t{color:var(--mute);font-size:.85rem;white-space:nowrap}
+.feed .what b{font-weight:600}
+.tag{font-size:.75rem;border:1px solid var(--line);border-radius:6px;padding:1px 6px;color:var(--mute);margin-left:6px}
+.note{color:var(--mute);padding:14px;text-align:center}
+.count{color:var(--mute);font-size:.9rem;margin:4px 0 6px}
+#msg{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90%;text-align:center}
 #msg.on{opacity:1}
-.count{color:var(--mute);font-size:.9rem}
+[hidden]{display:none!important}
 </style>
 </head>
 <body>
 <main>
   <h1>Shadow Sessions Admin</h1>
+
   <div class="bar">
     <input id="key" type="password" placeholder="Admin key" autocomplete="off">
-    <button class="ghost" id="copy" type="button">Copy sign-ups</button>
-    <button class="ghost" id="reload" type="button">Refresh</button>
+    <button id="unlock" type="button">Unlock</button>
+    <span id="lockstate" class="count"></span>
   </div>
-  <div class="count" id="count"></div>
-  <div id="list"></div>
+
+  <div class="tabs">
+    <button id="tabSlots" class="on" type="button">Slots</button>
+    <button id="tabFeed" type="button">Activity</button>
+  </div>
+
+  <div class="bar">
+    <select id="fc" aria-label="Campus"></select>
+    <select id="fd" aria-label="Date"></select>
+    <select id="fs" aria-label="Status"><option value="">All slots</option><option value="open">Open only</option><option value="taken">Taken only</option></select>
+    <input id="fq" type="search" placeholder="Search a name">
+  </div>
+
+  <div id="slotsView">
+    <div class="chips" id="sum"></div>
+    <div class="bar">
+      <button class="ghost" id="copy" type="button">Copy list</button>
+      <button class="ghost" id="csv" type="button">Export CSV</button>
+      <button class="ghost" id="reload" type="button">Refresh</button>
+      <button class="rel" id="relall" type="button" hidden></button>
+    </div>
+    <div class="count" id="count"></div>
+    <div id="list"></div>
+  </div>
+
+  <div id="feedView" hidden>
+    <div class="count" id="feedcount"></div>
+    <div class="feed" id="feed"></div>
+  </div>
 </main>
 <div id="msg" role="status"></div>
 <script>
@@ -54,63 +101,267 @@ const GROUPS=[
 ];
 const sid=(d,g,r,t)=>[d.replace(/\s*\(.*\)\s*$/,""),g,r,t].join("-").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/-$/,"");
 const $=id=>document.getElementById(id);
-let claims={};
-function toast(t){const m=$("msg");m.textContent=t;m.classList.add("on");clearTimeout(toast.h);toast.h=setTimeout(()=>m.classList.remove("on"),2600)}
- 
-async function load(){
+
+// Flat list of every slot, plus a lookup by id (used to label the activity feed)
+const SLOTS=[],IDX={};
+GROUPS.forEach(g=>g.days.forEach(dy=>dy.roles.forEach(r=>r.t.forEach(t=>{
+  const s={id:sid(dy.d,g.title,r.n,t),campus:g.title,date:dy.d,role:r.n,time:t};SLOTS.push(s);IDX[s.id]=s;
+}))));
+const dayNum=d=>parseInt(d,10)||0;
+const slotText=s=>s.role+(s.time?" ("+s.time+")":"");
+
+let claims={},feed=[],keyOk=false,tab="slots";
+const F={campus:"",date:"",status:"",q:""};
+
+function toast(t){const m=$("msg");m.textContent=t;m.classList.add("on");clearTimeout(toast.h);toast.h=setTimeout(()=>m.classList.remove("on"),2800)}
+function el(tag,text,cls){const e=document.createElement(tag);if(text!=null)e.textContent=text;if(cls)e.className=cls;return e}
+
+// ---------- server calls ----------
+async function loadSlots(){
   try{
     const r=await fetch("/api/slots",{headers:{"x-token":"admin"}});
     if(!r.ok)throw 0;
     claims=(await r.json()).claims||{};
   }catch(e){toast("Can't reach the server")}
-  render();
+  renderAll();
 }
- 
-function render(){
-  const root=$("list");root.textContent="";
-  let taken=0,total=0;
-  GROUPS.forEach(g=>g.days.forEach(dy=>{const d=dy.d;
-    const h=document.createElement("h2");h.textContent=g.title+" · "+d;root.appendChild(h);
-    dy.roles.forEach(r=>r.t.forEach(t=>{
-      const id=sid(d,g.title,r.n,t),c=claims[id];total++;
-      const row=document.createElement("div");row.className="row";
-      const left=document.createElement("div");
-      const a=document.createElement("div");a.textContent=r.n+(t?" · "+t:"");
-      const b=document.createElement("small");
-      if(c){taken++;b.className="who";b.textContent=c.name}else{b.className="open";b.textContent="Open"}
-      left.append(a,b);row.appendChild(left);
-      if(c){const btn=document.createElement("button");btn.className="rel";btn.type="button";btn.textContent="Release";btn.onclick=()=>release(id,c.name);row.appendChild(btn)}
-      root.appendChild(row);
-    }));
-  }));
-  $("count").textContent=taken+" of "+total+" slots taken";
-}
- 
-async function release(id,name){
+async function adm(action,extra){
   const k=$("key").value.trim();
-  if(!k){toast("Enter the admin key first");$("key").focus();return}
-  if(!confirm("Release "+name+"'s slot?"))return;
+  if(!k){toast("Enter the admin key first");$("key").focus();return null}
+  try{
+    const r=await fetch("/api/admin",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(Object.assign({adminKey:k,action},extra||{}))});
+    let d={};try{d=await r.json()}catch(e){}
+    if(r.status===403){keyOk=false;try{sessionStorage.removeItem("adminkey")}catch(e){}toast("Wrong admin key");renderAll();return null}
+    return {status:r.status,data:d};
+  }catch(e){toast("Can't reach the server");return null}
+}
+async function unlock(quiet){
+  const res=await adm("activity");
+  if(res&&res.status===200){
+    keyOk=true;feed=res.data.log||[];
+    try{sessionStorage.setItem("adminkey",$("key").value.trim())}catch(e){}
+    if(!quiet)toast("Unlocked");
+  }
+  renderAll();
+}
+async function refreshFeed(){
+  if(!keyOk)return;
+  const res=await adm("activity");
+  if(res&&res.status===200){feed=res.data.log||[];renderAll()}
+}
+
+// ---------- filters ----------
+function match(s){
+  if(F.campus&&s.campus!==F.campus)return false;
+  if(F.date&&s.date!==F.date)return false;
+  const c=claims[s.id];
+  if(F.status==="open"&&c)return false;
+  if(F.status==="taken"&&!c)return false;
+  if(F.q&&!(c&&c.name.toLowerCase().includes(F.q.toLowerCase())))return false;
+  return true;
+}
+function fillFilters(){
+  const fc=$("fc"),fd=$("fd");
+  fc.textContent="";
+  const all=el("option","All campuses");all.value="";fc.appendChild(all);
+  GROUPS.forEach(g=>{const o=el("option",g.title);o.value=g.title;fc.appendChild(o)});
+  fc.value=F.campus;
+  fillDates();
+}
+function fillDates(){
+  const fd=$("fd");fd.textContent="";
+  const all=el("option","All dates");all.value="";fd.appendChild(all);
+  const dates=[...new Set(SLOTS.filter(s=>!F.campus||s.campus===F.campus).map(s=>s.date))].sort((a,b)=>dayNum(a)-dayNum(b));
+  dates.forEach(d=>{const o=el("option",d);o.value=d;fd.appendChild(o)});
+  if(!dates.includes(F.date))F.date="";
+  fd.value=F.date;
+}
+
+// ---------- slots view ----------
+function renderSlots(){
+  // campus progress chips (respect the date filter); click one to filter by that campus
+  const sum=$("sum");sum.textContent="";
+  GROUPS.forEach(g=>{
+    const ss=SLOTS.filter(s=>s.campus===g.title&&(!F.date||s.date===F.date));
+    if(!ss.length)return;
+    const t=ss.filter(s=>claims[s.id]).length;
+    const c=el("button",null,"chip"+(F.campus===g.title?" on":""));c.type="button";
+    c.append(g.title+" ",el("b",t+"/"+ss.length));
+    c.onclick=()=>{F.campus=F.campus===g.title?"":g.title;fillFilters();renderAll()};
+    sum.appendChild(c);
+  });
+
+  const root=$("list");root.textContent="";
+  const groups=[];
+  GROUPS.forEach(g=>g.days.forEach(dy=>{
+    const all=SLOTS.filter(s=>s.campus===g.title&&s.date===dy.d);
+    const shown=all.filter(match);
+    if(shown.length)groups.push({g,dy,all,shown});
+  }));
+  groups.sort((a,b)=>dayNum(a.dy.d)-dayNum(b.dy.d)||GROUPS.indexOf(a.g)-GROUPS.indexOf(b.g));
+  let n=0;
+  groups.forEach(({g,dy,all,shown})=>{
+    const taken=all.filter(s=>claims[s.id]).length;
+    const h=el("h2",g.title+" · "+dy.d);
+    h.appendChild(el("small",taken+" of "+all.length+" taken"));
+    if(!taken)h.appendChild(el("small","no sign-ups yet","warn"));
+    root.appendChild(h);
+    shown.forEach(s=>{
+      n++;
+      const c=claims[s.id];
+      const row=el("div",null,"row");
+      const left=el("div");
+      left.appendChild(el("div",slotText(s)));
+      left.appendChild(el("small",c?c.name:"Open",c?"who":"open"));
+      row.appendChild(left);
+      const btns=el("div",null,"btns");
+      if(c){
+        const rn=el("button","Rename","ghost sm");rn.type="button";rn.onclick=()=>rename(s,c);
+        const rl=el("button","Release","rel sm");rl.type="button";rl.onclick=()=>release(s,c);
+        btns.append(rn,rl);
+      }else{
+        const bk=el("button","Book for someone","add sm");bk.type="button";bk.onclick=()=>book(s);
+        btns.appendChild(bk);
+      }
+      row.appendChild(btns);root.appendChild(row);
+    });
+  });
+  if(!n)root.appendChild(el("div","Nothing matches these filters.","note"));
+  const total=SLOTS.length,taken=SLOTS.filter(s=>claims[s.id]).length;
+  $("count").textContent="Showing "+n+" slots · "+taken+" of "+total+" taken overall";
+
+  // "release everything on this date" appears once a date is chosen
+  const ra=$("relall");
+  if(F.date){ra.hidden=false;ra.textContent="Release all on "+F.date+(F.campus?" ("+F.campus+")":"")}
+  else ra.hidden=true;
+}
+
+// ---------- activity view ----------
+function whenText(iso){
+  try{return new Date(iso).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}catch(e){return iso}
+}
+function renderFeed(){
+  const root=$("feed");root.textContent="";
+  if(!keyOk){$("feedcount").textContent="";root.appendChild(el("div","Enter the admin key and press Unlock to see activity.","note"));return}
+  const rows=feed.filter(l=>{
+    const s=IDX[l.slot];
+    if(F.campus&&(!s||s.campus!==F.campus))return false;
+    if(F.date&&(!s||s.date!==F.date))return false;
+    if(F.q&&!(l.name||"").toLowerCase().includes(F.q.toLowerCase()))return false;
+    return true;
+  });
+  $("feedcount").textContent=rows.length+" of "+feed.length+" recent events (newest first)";
+  if(!rows.length)root.appendChild(el("div","No activity yet. New sign-ups and releases appear here.","note"));
+  rows.forEach(l=>{
+    const s=IDX[l.slot];
+    const row=el("div",null,"row");
+    const what=el("div",null,"what");
+    const name=l.name||"Someone";
+    if(l.action==="claim")what.append(el("b",name)," signed up");
+    else if(l.action==="book")what.append("Admin booked ",el("b",name));
+    else if(l.action==="rename")what.append("Admin renamed ",el("b",name));
+    else what.append(el("b",name),"'s slot was released");
+    if(l.action==="release")what.appendChild(el("span",l.actor==="admin"?"by admin":"by volunteer","tag"));
+    what.appendChild(el("small",s?s.campus+" · "+s.date+" · "+slotText(s):l.slot));
+    row.append(what,el("div",whenText(l.at),"t"));
+    root.appendChild(row);
+  });
+}
+
+function renderAll(){
+  $("lockstate").textContent=keyOk?"Unlocked":"Locked: you can view, but not change anything";
+  $("unlock").textContent=keyOk?"Re-check":"Unlock";
+  $("tabSlots").className=tab==="slots"?"on":"";
+  $("tabFeed").className=tab==="feed"?"on":"";
+  $("slotsView").hidden=tab!=="slots";
+  $("feedView").hidden=tab!=="feed";
+  $("fs").hidden=tab==="feed";
+  renderSlots();renderFeed();
+}
+
+// ---------- actions ----------
+async function release(s,c){
+  if(!confirm("Release "+c.name+"'s slot?\n"+s.campus+" · "+s.date+" · "+slotText(s)))return;
+  await singleRelease(s.id);
+}
+async function singleRelease(id){
+  const k=$("key").value.trim();
+  if(!k){toast("Enter the admin key first");return}
   try{
     const r=await fetch("/api/release",{method:"POST",headers:{"content-type":"application/json","x-token":"admin"},body:JSON.stringify({id,adminKey:k})});
     toast(r.status===200?"Slot released":r.status===403?"Wrong admin key":"Couldn't release");
-  }catch(e){toast("Couldn't release. Check your connection.")}
-  load();
+  }catch(e){toast("Can't reach the server")}
+  await loadSlots();refreshFeed();
 }
- 
+async function book(s){
+  const name=(prompt("Name to book into this slot:\n"+s.campus+" · "+s.date+" · "+slotText(s))||"").trim();
+  if(!name)return;
+  const res=await adm("book",{id:s.id,name});
+  if(!res)return;
+  toast(res.status===200?"Booked":res.status===409?"Someone just took that slot":"Couldn't book");
+  await loadSlots();refreshFeed();
+}
+async function rename(s,c){
+  const name=(prompt("Change the name on this slot:",c.name)||"").trim();
+  if(!name||name===c.name)return;
+  const res=await adm("rename",{id:s.id,name});
+  if(!res)return;
+  toast(res.status===200?"Name updated":"Couldn't rename");
+  await loadSlots();refreshFeed();
+}
+async function releaseAll(){
+  const ids=SLOTS.filter(s=>(!F.campus||s.campus===F.campus)&&s.date===F.date&&claims[s.id]);
+  if(!ids.length){toast("No sign-ups on that date");return}
+  if(!confirm("Release all "+ids.length+" sign-up(s) on "+F.date+(F.campus?" at "+F.campus:" across all campuses")+"?\nThis can't be undone."))return;
+  const res=await adm("releaseMany",{date:F.date,campus:F.campus});
+  if(!res)return;
+  toast(res.status===200?"Released "+res.data.released+" slot(s)":"Couldn't release");
+  await loadSlots();refreshFeed();
+}
+
+function takenRows(){return SLOTS.filter(s=>match(s)&&claims[s.id])}
 function summary(){
-  const out=[];
-  GROUPS.forEach(g=>g.days.forEach(dy=>{const d=dy.d;
-    const lines=[];
-    dy.roles.forEach(r=>r.t.forEach(t=>{const c=claims[sid(d,g.title,r.n,t)];if(c)lines.push("  "+r.n+(t?" ("+t+")":"")+": "+c.name)}));
-    if(lines.length)out.push(g.title+" · "+d,...lines);
-  }));
-  return out.join("\n")||"No sign-ups yet.";
+  const out=[];let last="";
+  takenRows().sort((a,b)=>dayNum(a.date)-dayNum(b.date)||GROUPS.findIndex(g=>g.title===a.campus)-GROUPS.findIndex(g=>g.title===b.campus)).forEach(s=>{
+    const h=s.campus+" · "+s.date;
+    if(h!==last){out.push(h);last=h}
+    out.push("  "+slotText(s)+": "+claims[s.id].name);
+  });
+  return out.join("\n")||"No sign-ups match these filters.";
 }
+function csvText(){
+  const q=v=>'"'+String(v).replace(/"/g,'""')+'"';
+  const rows=[["Campus","Date","Role","Time","Status","Name"]];
+  SLOTS.filter(match).sort((a,b)=>dayNum(a.date)-dayNum(b.date)||GROUPS.findIndex(g=>g.title===a.campus)-GROUPS.findIndex(g=>g.title===b.campus)).forEach(s=>{
+    const c=claims[s.id];rows.push([s.campus,s.date,s.role,s.time,c?"Taken":"Open",c?c.name:""]);
+  });
+  return "﻿"+rows.map(r=>r.map(q).join(",")).join("\r\n");
+}
+function download(name,text){
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([text],{type:"text/csv;charset=utf-8"}));
+  a.download=name;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+// ---------- wiring ----------
+$("fc").onchange=e=>{F.campus=e.target.value;fillDates();renderAll()};
+$("fd").onchange=e=>{F.date=e.target.value;renderAll()};
+$("fs").onchange=e=>{F.status=e.target.value;renderAll()};
+$("fq").oninput=e=>{F.q=e.target.value.trim();renderAll()};
+$("tabSlots").onclick=()=>{tab="slots";renderAll()};
+$("tabFeed").onclick=()=>{tab="feed";renderAll();refreshFeed()};
+$("unlock").onclick=()=>unlock(false);
+$("key").addEventListener("keydown",e=>{if(e.key==="Enter")unlock(false)});
+$("reload").onclick=()=>{loadSlots();refreshFeed()};
+$("relall").onclick=releaseAll;
 $("copy").onclick=async()=>{try{await navigator.clipboard.writeText(summary());toast("Copied")}catch(e){toast("Couldn't copy")}};
-$("reload").onclick=load;
-load();setInterval(()=>{if(!document.hidden)load()},15000);
+$("csv").onclick=()=>{try{download("shadow-signups.csv",csvText());toast("CSV downloaded")}catch(e){toast("Couldn't export")}};
+
+fillFilters();
+try{const k=sessionStorage.getItem("adminkey");if(k){$("key").value=k;unlock(true)}}catch(e){}
+loadSlots();
+setInterval(()=>{if(!document.hidden){loadSlots();refreshFeed()}},15000);
 </script>
 </body>
 </html>
- 
-Claude finished the response
