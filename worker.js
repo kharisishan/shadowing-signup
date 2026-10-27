@@ -1,15 +1,19 @@
 // Cloudflare Worker: handles /api/slots, /api/claim, /api/release; everything else is served from ./public
 // Storage: D1 (binding "DB"). Optional secret: ADMIN_KEY.
 
-const ROLES = ["Graphics & Slides", "Lyrics & Sermon", "Lights", "Internal Livestream & Translations"];
-const GROUPS = [
-  { title: "Mandarin", roles: [{ n: "Lyrics", t: [""] }, { n: "Sermon", t: [""] }] },
-  { title: "Putra", roles: ROLES.map(n => ({ n, t: ["9 AM", "11 AM"] })) },
-  { title: "PJ", roles: ROLES.map(n => ({ n, t: ["9 AM", "11 AM"] })) },
+const FOUR=["Mac 1 Graphics & Slides","Mac 2 Lyrics & Sermon","Lights","Internal Livestream & Translations"];
+const mk=(names,times)=>names.map(n=>({n,t:times}));
+const day=(d,roles)=>({d,roles});
+// Putra/PJ: all four roles at 9 AM and 11 AM
+const std=d=>day(d,mk(FOUR,["9 AM","11 AM"]));
+const GROUPS=[
+ {title:"Subang",days:["1st November","15th November"].map(d=>day(d,mk(["Lyrics","Sermon","Lyrics (Side Screens)","Lights"],["5 PM"])))},
+ {title:"Mandarin",days:["1st November","8th November","15th November"].map(d=>day(d,mk(["Lyrics","Sermon","Lights"],["2 PM"])))},
+ {title:"Putra",days:["1st November","8th November","15th November","22nd November"].map(std)},
+ {title:"PJ",days:["1st November","8th November","22nd November"].map(std)}
 ];
-const DATES = ["7th October", "14th October"];
-const sid = (d, g, r, t) => [d, g, r, t].join("-").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-$/, "");
-const IDS = new Set(DATES.flatMap(d => GROUPS.flatMap(g => g.roles.flatMap(r => r.t.map(t => sid(d, g.title, r.n, t))))));
+const sid = (d, g, r, t) => [d.replace(/\s*\(.*\)\s*$/, ""), g, r, t].join("-").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-$/, "");
+const IDS = new Set(GROUPS.flatMap(g => g.days.flatMap(x => x.roles.flatMap(r => r.t.map(t => sid(x.d, g.title, r.n, t))))));
 
 const json = (o, s = 200) =>
   new Response(JSON.stringify(o), {
@@ -24,6 +28,7 @@ async function handleApi(request, env) {
 
     const route = new URL(request.url).pathname.replace(/^\/api\/?/, "");
     const token = request.headers.get("x-token") || "";
+    if (request.method === "GET" && route === "admin-check") return json({ adminKeySet: !!env.ADMIN_KEY });
 
     if (request.method === "GET" && route === "slots") {
       const { results } = await db.prepare("SELECT id, name, token FROM claims").all();
