@@ -45,6 +45,93 @@ button.add{background:transparent;color:var(--acc);border-color:var(--acc)}
 #msg{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90%;text-align:center}
 #msg.on{opacity:1}
 [hidden]{display:none!important}
+
+/* ---- dashboard (morethancables look: charcoal, white titles, teal-green accent) ---- */
+.dash{
+  /* BRAND COLOURS: change these to match the official palette */
+  --d-bg:#12171a;--d-card:#1a2124;--d-line:#2a3336;--d-ink:#f3f6f5;--d-mute:#9aa8aa;
+  --d-acc:#34d3b1;--d-track:#243133;--d-warn:#e6b04a;
+  background:var(--d-bg);color:var(--d-ink);border-radius:16px;padding:18px;border:1px solid var(--d-line)}
+.dash *{min-width:0}
+.d-brand{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0 0 14px;color:var(--d-mute);font-size:.85rem}
+.d-brand b{color:var(--d-ink);font-size:1rem;letter-spacing:.01em}
+.d-brand b i{font-style:normal;color:var(--d-acc)}
+.d-top{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:10px;margin-bottom:10px}
+@media (max-width:620px){.d-top{grid-template-columns:1fr}}
+.d-card{background:var(--d-card);border:1px solid var(--d-line);border-radius:14px;padding:14px;margin-bottom:10px}
+.d-top .d-card{margin-bottom:0}
+.d-card h3{font-size:.78rem;letter-spacing:.07em;text-transform:lowercase;color:var(--d-mute);font-weight:600;margin:0 0 10px}
+.d-hero{font-size:3.6rem;line-height:1;font-weight:700;letter-spacing:-.02em;color:var(--d-ink)}
+.d-hero small{font-size:1.05rem;font-weight:500;color:var(--d-mute);letter-spacing:0;margin-left:8px}
+.d-meter{height:10px;border-radius:999px;background:var(--d-track);margin-top:14px;overflow:hidden}
+.d-meter>i{display:block;height:100%;background:var(--d-acc);border-radius:999px}
+.d-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.d-tile{background:var(--d-card);border:1px solid var(--d-line);border-radius:14px;padding:12px 14px}
+.d-tile .l{color:var(--d-mute);font-size:.8rem}
+.d-tile .v{font-size:1.7rem;font-weight:650;line-height:1.15;margin-top:2px}
+.d-tile .v.sm{font-size:1.05rem;line-height:1.3;margin-top:6px}
+.d-tile .s{color:var(--d-mute);font-size:.8rem;margin-top:2px}
+.d-tile.warn{border-color:var(--d-warn)}
+.d-tile.warn .l{color:var(--d-warn)}
+.d-bars{display:grid;gap:10px}
+.d-bar{display:grid;grid-template-columns:minmax(78px,118px) minmax(0,1fr) auto;gap:10px;align-items:center;cursor:default;border-radius:8px;outline-offset:3px}
+.d-bar:hover,.d-bar:focus-visible{outline:1px solid var(--d-line)}
+.d-bar .n{font-size:.9rem;overflow-wrap:anywhere}
+.d-bar .t{height:14px;border-radius:4px;background:var(--d-track);position:relative}
+.d-bar .t>i{position:absolute;left:0;top:0;bottom:0;background:var(--d-acc);border-radius:0 4px 4px 0;min-width:0}
+.d-bar .t>i.zero{display:none}
+.d-bar .v{font-size:.85rem;color:var(--d-ink);white-space:nowrap;min-width:78px;text-align:right}
+.d-bar .v span{color:var(--d-mute)}
+.d-heat{display:grid;gap:2px}
+.d-heat .h{color:var(--d-mute);font-size:.75rem;text-align:center;padding:2px 0 6px;white-space:nowrap}
+.d-heat .r{color:var(--d-ink);font-size:.85rem;display:flex;align-items:center;padding-right:8px}
+button.d-cell{all:unset;box-sizing:border-box;display:flex;align-items:center;justify-content:center;height:44px;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer}
+button.d-cell:hover,button.d-cell:focus-visible{outline:2px solid var(--d-ink);outline-offset:-2px}
+.d-cell.none{display:flex;align-items:center;justify-content:center;height:44px;border-radius:8px;background:transparent;border:1px dashed var(--d-line);color:var(--d-mute);cursor:default;font-weight:400;font-size:.88rem}
+.d-legend{display:flex;align-items:center;gap:8px;margin-top:10px;color:var(--d-mute);font-size:.78rem}
+.d-legend i{display:block;width:120px;height:8px;border-radius:999px}
+.d-cols{display:flex;gap:2px;align-items:flex-end;height:120px;padding-top:18px}
+.d-col{flex:1 1 0;max-width:24px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;position:relative;cursor:default;border-radius:6px;outline-offset:2px}
+.d-col:hover,.d-col:focus-visible{outline:1px solid var(--d-line)}
+.d-col .b{width:100%;background:var(--d-acc);border-radius:4px 4px 0 0;min-height:2px}
+.d-col .b.z{background:var(--d-track)}
+.d-col .x{font-size:.68rem;color:var(--d-mute);line-height:1}
+.d-col .top{position:absolute;top:-16px;font-size:.75rem;color:var(--d-ink);font-weight:600}
+.d-note{color:var(--d-mute);font-size:.9rem}
+.d-table summary{cursor:pointer;color:var(--d-mute);font-size:.85rem}
+.d-table table{width:100%;border-collapse:collapse;margin-top:10px;font-size:.85rem}
+.d-table th,.d-table td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--d-line)}
+.d-table th{color:var(--d-mute);font-weight:600}
+.d-table td.num,.d-table th.num{text-align:right;font-variant-numeric:tabular-nums}
+.d-rings{display:grid;grid-template-columns:repeat(auto-fit,minmax(138px,1fr));gap:10px}
+button.d-ring{all:unset;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 6px 12px;border-radius:12px;cursor:pointer;border:1px solid transparent;text-align:center}
+button.d-ring:hover,button.d-ring:focus-visible{border-color:var(--d-line);background:rgba(255,255,255,.03)}
+button.d-ring.on{border-color:var(--d-acc)}
+.d-ring svg{width:104px;height:104px;display:block}
+.d-ring .rt{stroke:var(--d-track)}
+.d-ring .rf{stroke:var(--d-acc)}
+.d-ring .rp{fill:var(--d-ink);font-size:22px;font-weight:700;font-family:inherit}
+.d-ring .rn{font-size:.95rem;font-weight:650;margin-top:4px}
+.d-ring .rs{font-size:.8rem;color:var(--d-mute)}
+.d-score{display:grid;gap:6px}
+.d-srow{display:grid;grid-template-columns:34px minmax(80px,170px) minmax(0,1fr) 44px;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.025);border:1px solid transparent;outline-offset:2px}
+.d-srow:hover,.d-srow:focus-visible{border-color:var(--d-line)}
+.d-srow.top{background:rgba(52,211,177,.08)}
+.d-rank{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;color:var(--d-mute);border:1px solid var(--d-line)}
+.d-srow.top .d-rank{background:var(--d-acc);color:#04100e;border-color:var(--d-acc)}
+.d-sname{font-size:.98rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.d-srow.top .d-sname{font-weight:650}
+.d-sbar{height:10px;border-radius:4px;background:var(--d-track)}
+.d-sbar>i{display:block;height:100%;background:var(--d-acc);border-radius:0 4px 4px 0}
+.d-snum{text-align:right;font-size:1.35rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+.d-snum small{display:block;font-size:.65rem;font-weight:400;color:var(--d-mute);margin-top:2px}
+.d-more{all:unset;cursor:pointer;color:var(--d-acc);font-size:.88rem;margin-top:10px;display:inline-block;border-radius:6px;outline-offset:3px}
+.d-more:focus-visible{outline:2px solid var(--d-acc)}
+@media (max-width:480px){.d-srow{grid-template-columns:30px minmax(0,1fr) 40px}.d-sbar{display:none}}
+.d-foot{text-align:center;color:var(--d-mute);font-size:.78rem;margin-top:14px}
+#tip{position:fixed;z-index:20;background:#0c1011;color:#f3f6f5;border:1px solid #2a3336;border-radius:10px;padding:8px 10px;font-size:.82rem;pointer-events:none;max-width:240px;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+#tip .tv{font-weight:650;font-size:.95rem}
+#tip .ts{color:#9aa8aa}
 </style>
 </head>
 <body>
@@ -59,6 +146,7 @@ button.add{background:transparent;color:var(--acc);border-color:var(--acc)}
 
   <div class="tabs">
     <button id="tabSlots" class="on" type="button">Slots</button>
+    <button id="tabDash" type="button">Dashboard</button>
     <button id="tabFeed" type="button">Activity</button>
   </div>
 
@@ -81,12 +169,15 @@ button.add{background:transparent;color:var(--acc);border-color:var(--acc)}
     <div id="list"></div>
   </div>
 
+  <div id="dashView" hidden><div class="dash" id="dash"></div></div>
+
   <div id="feedView" hidden>
     <div class="count" id="feedcount"></div>
     <div class="feed" id="feed"></div>
   </div>
 </main>
 <div id="msg" role="status"></div>
+<div id="tip" role="tooltip" hidden></div>
 <script>
 const FOUR=["Mac 1 Graphics & Slides","Mac 2 Lyrics & Sermon","Lights","Internal Livestream & Translations"];
 const mk=(names,times)=>names.map(n=>({n,t:times}));
@@ -110,7 +201,7 @@ GROUPS.forEach(g=>g.days.forEach(dy=>dy.roles.forEach(r=>r.t.forEach(t=>{
 const dayNum=d=>parseInt(d,10)||0;
 const slotText=s=>s.role+(s.time?" ("+s.time+")":"");
 
-let claims={},feed=[],keyOk=false,tab="slots";
+let claims={},feed=[],keyOk=false,tab="slots",sbAll=false;
 const F={campus:"",date:"",status:"",q:""};
 
 function toast(t){const m=$("msg");m.textContent=t;m.classList.add("on");clearTimeout(toast.h);toast.h=setTimeout(()=>m.classList.remove("on"),2800)}
@@ -272,11 +363,15 @@ function renderAll(){
   $("lockstate").textContent=keyOk?"Unlocked":"Locked: you can view, but not change anything";
   $("unlock").textContent=keyOk?"Re-check":"Unlock";
   $("tabSlots").className=tab==="slots"?"on":"";
+  $("tabDash").className=tab==="dash"?"on":"";
   $("tabFeed").className=tab==="feed"?"on":"";
   $("slotsView").hidden=tab!=="slots";
+  $("dashView").hidden=tab!=="dash";
   $("feedView").hidden=tab!=="feed";
-  $("fs").hidden=tab==="feed";
+  $("fs").hidden=tab!=="slots";
+  $("fq").hidden=tab==="dash";
   renderSlots();renderFeed();
+  if(tab==="dash")renderDash();
 }
 
 // ---------- actions ----------
@@ -344,12 +439,233 @@ function download(name,text){
   setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
 
+
+// ---------- dashboard ----------
+const RAMP_LO=[36,49,51],RAMP_HI=[52,211,177];   // empty -> full (teal-green). Change with the CSS colours above.
+const rampAt=t=>RAMP_LO.map((a,i)=>Math.round(a+(RAMP_HI[i]-a)*t));
+const rgb=c=>"rgb("+c.join(",")+")";
+const relLum=c=>{const f=v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)};return .2126*f(c[0])+.7152*f(c[1])+.0722*f(c[2])};
+const contrast=(a,b)=>{const x=relLum(a),y=relLum(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05)};
+const INK_LIGHT=[255,255,255],INK_DARK=[4,16,14];   // label colours; the page picks whichever contrasts more on each cell
+const inkOn=c=>contrast(c,INK_LIGHT)>=contrast(c,INK_DARK)?rgb(INK_LIGHT):rgb(INK_DARK);
+const short=d=>d.replace(/(\d+)(?:st|nd|rd|th)\s+(\w{3})\w*/,"$1 $2");
+const cnt=a=>({t:a.filter(s=>claims[s.id]).length,n:a.length});
+const pctOf=c=>c.n?Math.round(100*c.t/c.n):0;
+
+const tip=$("tip");
+function tipShow(node,lines){
+  tip.textContent="";
+  lines.forEach((l,i)=>tip.appendChild(el("div",l,i===0?"tv":"ts")));
+  tip.hidden=false;
+  const r=node.getBoundingClientRect(),w=tip.offsetWidth,h=tip.offsetHeight;
+  const x=Math.max(8,Math.min(r.left+r.width/2-w/2,window.innerWidth-w-8));
+  tip.style.left=x+"px";
+  tip.style.top=(r.top-h-8>8?r.top-h-8:r.bottom+8)+"px";
+}
+function tipHide(){tip.hidden=true}
+function hover(node,lines){
+  node.tabIndex=0;node.setAttribute("aria-label",lines.join(", "));
+  node.addEventListener("pointerenter",()=>tipShow(node,lines));
+  node.addEventListener("pointerleave",tipHide);
+  node.addEventListener("focus",()=>tipShow(node,lines));
+  node.addEventListener("blur",tipHide);
+}
+function card(title){const c=el("div",null,"d-card");if(title)c.appendChild(el("h3",title));return c}
+function barRow(name,c,tipLines){
+  const row=el("div",null,"d-bar");
+  row.appendChild(el("div",name,"n"));
+  const t=el("div",null,"t"),f=el("i",null,c.t?"":"zero");f.style.width=pctOf(c)+"%";t.appendChild(f);row.appendChild(t);
+  const v=el("div",null,"v");v.append(c.t+"/"+c.n+" ",el("span",pctOf(c)+"%"));row.appendChild(v);
+  hover(row,tipLines);return row;
+}
+function renderDash(){
+  const root=$("dash");root.textContent="";
+  const ss=SLOTS.filter(s=>(!F.campus||s.campus===F.campus)&&(!F.date||s.date===F.date));
+  const all=cnt(ss),open=all.n-all.t;
+  const scope=(F.campus||"all campuses")+" · "+(F.date||"all dates");
+
+  const brand=el("div",null,"d-brand");
+  const wm=el("b");wm.append("more than ",el("i","cables"));
+  brand.append(wm,el("span","shadow sessions · "+scope));
+  root.appendChild(brand);
+
+  // groups: one per campus + date
+  const groups=[];
+  GROUPS.forEach(g=>g.days.forEach(dy=>{
+    const a=ss.filter(s=>s.campus===g.title&&s.date===dy.d);
+    if(a.length)groups.push({campus:g.title,date:dy.d,c:cnt(a)});
+  }));
+  const empty=groups.filter(x=>x.c.t===0);
+  const best=groups.filter(x=>x.c.t>0).sort((a,b)=>b.c.t/b.c.n-a.c.t/a.c.n||b.c.t-a.c.t)[0];
+
+  // headline + tiles
+  const top=el("div",null,"d-top");
+  const hero=card("slots taken");
+  const big=el("div",null,"d-hero");big.append(String(all.t),el("small","of "+all.n+" · "+pctOf(all)+"%"));
+  hero.appendChild(big);
+  const m=el("div",null,"d-meter"),mf=el("i");mf.style.width=pctOf(all)+"%";m.appendChild(mf);hero.appendChild(m);
+  top.appendChild(hero);
+  const tiles=el("div",null,"d-tiles");
+  const t1=el("div",null,"d-tile");t1.append(el("div","open slots","l"),el("div",String(open),"v"),el("div","still to fill","s"));
+  const t2=el("div",null,"d-tile"+(empty.length?" warn":""));
+  t2.append(el("div",(empty.length?"⚠ ":"")+"no sign-ups yet","l"),el("div",String(empty.length),"v"),el("div",empty.length===1?"session":"sessions","s"));
+  const t3=el("div",null,"d-tile");
+  t3.append(el("div","fullest session","l"),el("div",best?best.campus+" · "+short(best.date):"–","v sm"),el("div",best?best.c.t+" of "+best.c.n+" taken":"nothing taken yet","s"));
+  tiles.append(t1,t2,t3);top.appendChild(tiles);root.appendChild(top);
+
+  // one ring per campus: how packed the month is (respects the date filter, always shows every campus)
+  const NS="http://www.w3.org/2000/svg";
+  const svgEl=(t,at)=>{const n=document.createElementNS(NS,t);for(const k in at)n.setAttribute(k,at[k]);return n};
+  const ringCard=card("how packed each campus is"+(F.date?" · "+F.date:""));
+  const rings=el("div",null,"d-rings");
+  const R=42,C=2*Math.PI*R;
+  GROUPS.forEach(g=>{
+    const a=SLOTS.filter(s=>s.campus===g.title&&(!F.date||s.date===F.date));if(!a.length)return;
+    const c=cnt(a),p=c.n?c.t/c.n:0;
+    const b=el("button",null,"d-ring"+(F.campus===g.title?" on":""));b.type="button";
+    const sv=svgEl("svg",{viewBox:"0 0 104 104",role:"img","aria-hidden":"true"});
+    sv.appendChild(svgEl("circle",{cx:52,cy:52,r:R,fill:"none","stroke-width":11,class:"rt"}));
+    if(c.t)sv.appendChild(svgEl("circle",{cx:52,cy:52,r:R,fill:"none","stroke-width":11,"stroke-linecap":"round",class:"rf",
+      "stroke-dasharray":(C*Math.min(p,.999)).toFixed(2)+" "+C.toFixed(2),transform:"rotate(-90 52 52)"}));
+    const tx=svgEl("text",{x:52,y:52,"text-anchor":"middle","dominant-baseline":"central",class:"rp"});tx.textContent=pctOf(c)+"%";
+    sv.appendChild(tx);b.appendChild(sv);
+    b.append(el("div",g.title,"rn"),el("div",c.t+" of "+c.n+" taken","rs"),el("div",(c.n-c.t)+" open","rs"));
+    hover(b,[g.title+": "+pctOf(c)+"% taken",c.t+" of "+c.n+" slots · "+(c.n-c.t)+" open",F.campus===g.title?"Tap to show all campuses":"Tap to focus the dashboard on this campus"]);
+    b.onclick=()=>{tipHide();F.campus=F.campus===g.title?"":g.title;fillFilters();renderAll()};
+    rings.appendChild(b);
+  });
+  ringCard.appendChild(rings);root.appendChild(ringCard);
+
+  // scoreboard: who has chosen the most slots (names are matched ignoring case and extra spaces)
+  const people=new Map();
+  ss.forEach(s=>{
+    const c=claims[s.id];if(!c||!c.name)return;
+    const nm=String(c.name).trim().replace(/\s+/g," ");if(!nm)return;
+    const k=nm.toLowerCase();let e=people.get(k);if(!e){e={forms:new Map(),slots:[]};people.set(k,e)}
+    e.forms.set(nm,(e.forms.get(nm)||0)+1);e.slots.push(s);
+  });
+  const board=[...people.values()].map(e=>({name:[...e.forms].sort((x,y)=>y[1]-x[1])[0][0],n:e.slots.length,slots:e.slots}));
+  board.sort((x,y)=>y.n-x.n||x.name.localeCompare(y.name));
+  let rk=0,pv=-1;board.forEach((r,i)=>{if(r.n!==pv){rk=i+1;pv=r.n}r.rank=rk});
+  const total=board.reduce((m,r)=>m+r.n,0);
+  const sc=card("scoreboard · most slots chosen");
+  if(!board.length){sc.appendChild(el("div","Nobody has signed up yet. The scoreboard fills in as people book.","d-note"))}
+  else{
+    sc.appendChild(el("div",board.length+(board.length===1?" person":" people")+" · "+total+" slots chosen"+(F.campus||F.date?" · "+scope:""),"d-note")).style.marginBottom="10px";
+    const mx=board[0].n,list=el("div",null,"d-score"),shown=sbAll?board:board.slice(0,8);
+    shown.forEach(r=>{
+      const row=el("div",null,"d-srow"+(r.rank<=3?" top":""));
+      row.appendChild(el("div",String(r.rank),"d-rank"));
+      row.appendChild(el("div",r.name,"d-sname"));
+      const bar=el("div",null,"d-sbar"),bi=el("i");bi.style.width=Math.round(100*r.n/mx)+"%";bar.appendChild(bi);row.appendChild(bar);
+      const num=el("div",String(r.n),"d-snum");num.appendChild(el("small",r.n===1?"slot":"slots"));row.appendChild(num);
+      const lines=[r.name+" · "+r.n+(r.n===1?" slot":" slots")];
+      const sl=r.slots.slice().sort((x,y)=>dayNum(x.date)-dayNum(y.date)||GROUPS.findIndex(g=>g.title===x.campus)-GROUPS.findIndex(g=>g.title===y.campus));
+      sl.slice(0,5).forEach(x=>lines.push(x.campus+" · "+short(x.date)+" · "+slotText(x)));
+      if(sl.length>5)lines.push("+ "+(sl.length-5)+" more");
+      hover(row,lines);list.appendChild(row);
+    });
+    sc.appendChild(list);
+    if(board.length>8){
+      const more=el("button",sbAll?"show top 8":"show all "+board.length);more.type="button";more.className="d-more";
+      more.onclick=()=>{sbAll=!sbAll;renderAll()};sc.appendChild(more);
+    }
+  }
+  root.appendChild(sc);
+
+  // campus x date heatmap
+  const heatCard=card("campus × date");
+  const dates=[...new Set(ss.map(s=>s.date))].sort((a,b)=>dayNum(a)-dayNum(b));
+  const camps=GROUPS.filter(g=>ss.some(s=>s.campus===g.title));
+  const heat=el("div",null,"d-heat");
+  heat.style.gridTemplateColumns="minmax(64px,auto) repeat("+dates.length+",minmax(0,1fr))";
+  heat.appendChild(el("div"));
+  dates.forEach(d=>heat.appendChild(el("div",short(d),"h")));
+  camps.forEach(g=>{
+    heat.appendChild(el("div",g.title,"r"));
+    dates.forEach(d=>{
+      const a=ss.filter(s=>s.campus===g.title&&s.date===d);
+      if(!a.length){const x=el("div","·","d-cell none");heat.appendChild(x);return}
+      const c=cnt(a),col=rampAt(c.n?c.t/c.n:0);
+      const b=el("button",c.t+"/"+c.n,"d-cell");b.type="button";
+      b.style.background=rgb(col);b.style.color=inkOn(col);
+      hover(b,[c.t+" of "+c.n+" taken",g.title+" · "+d]);
+      b.onclick=()=>{tipHide();F.campus=g.title;F.date=d;fillFilters();tab="slots";renderAll()};
+      heat.appendChild(b);
+    });
+  });
+  if(camps.length&&dates.length)heatCard.appendChild(heat);else heatCard.appendChild(el("div","Nothing to show for this filter.","d-note"));
+  const lg=el("div",null,"d-legend"),bar=el("i");
+  bar.style.background="linear-gradient(90deg,"+rgb(rampAt(0))+","+rgb(rampAt(1))+")";
+  lg.append("none taken",bar,"all taken");heatCard.appendChild(lg);
+  heatCard.appendChild(el("div","Tap a cell to open that session in the slot list.","d-note")).style.marginTop="6px";
+  root.appendChild(heatCard);
+
+  // roles: most open slots first
+  const roleMap=new Map();
+  ss.forEach(s=>{if(!roleMap.has(s.role))roleMap.set(s.role,[]);roleMap.get(s.role).push(s)});
+  const roles=[...roleMap].map(([r,a])=>({r,c:cnt(a)})).sort((a,b)=>(b.c.n-b.c.t)-(a.c.n-a.c.t)||a.r.localeCompare(b.r));
+  const roleCard=card("where we need people (most open slots first)");
+  const rb=el("div",null,"d-bars");
+  roles.forEach(x=>rb.appendChild(barRow(x.r,x.c,[x.c.t+" of "+x.c.n+" taken",x.r+" · "+(x.c.n-x.c.t)+" open"])));
+  roleCard.appendChild(rb);root.appendChild(roleCard);
+
+  // sign-ups by day (needs the admin key: the data comes from the activity log)
+  const dayCard=card("sign-ups by day");
+  if(!keyOk){
+    dayCard.appendChild(el("div","Unlock with the admin key to see how sign-ups build up over time.","d-note"));
+  }else{
+    const ok=l=>{const s=IDX[l.slot];if(!F.campus&&!F.date)return true;if(!s)return false;return(!F.campus||s.campus===F.campus)&&(!F.date||s.date===F.date)};
+    const ev=feed.filter(l=>(l.action==="claim"||l.action==="book"||l.action==="release")&&ok(l));
+    const dk=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+    const ups=new Map(),rel=new Map();
+    ev.forEach(l=>{const k=dk(new Date(l.at));const m2=l.action==="release"?rel:ups;m2.set(k,(m2.get(k)||0)+1)});
+    if(!ups.size){dayCard.appendChild(el("div","No sign-ups recorded yet. They appear here as people book.","d-note"))}
+    else{
+      const first=new Date([...ups.keys()].sort()[0]+"T00:00:00"),today=new Date();today.setHours(0,0,0,0);
+      let start=first;const cap=new Date(today);cap.setDate(cap.getDate()-13);if(start<cap)start=cap;
+      const days=[];for(let d=new Date(start);d<=today;d.setDate(d.getDate()+1))days.push(new Date(d));
+      const vals=days.map(d=>ups.get(dk(d))||0),max=Math.max(1,...vals),top=vals.indexOf(Math.max(...vals));
+      const cols=el("div",null,"d-cols");
+      days.forEach((d,i)=>{
+        const col=el("div",null,"d-col"),b=el("div",null,"b"+(vals[i]?"":" z"));
+        b.style.height=Math.round(100*vals[i]/max)*0.78+"%";
+        if(i===top&&vals[i])col.appendChild(el("span",String(vals[i]),"top"));
+        col.append(b,el("span",String(d.getDate()),"x"));
+        const r=rel.get(dk(d))||0;
+        hover(col,[vals[i]+(vals[i]===1?" sign-up":" sign-ups"),d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})+(r?" · "+r+" released":"")]);
+        cols.appendChild(col);
+      });
+      dayCard.appendChild(cols);
+      dayCard.appendChild(el("div","From the latest "+feed.length+" recorded events. Last "+days.length+" days.","d-note")).style.marginTop="8px";
+    }
+  }
+  root.appendChild(dayCard);
+
+  // table view: every number above, without hovering
+  const tv=el("details",null,"d-card d-table");
+  tv.appendChild(el("summary","view as a table"));
+  const tb=el("table"),th=el("thead"),hr=el("tr");
+  ["Campus","Date","Taken","Open","Total"].forEach((h,i)=>hr.appendChild(el("th",h,i>1?"num":"")));
+  th.appendChild(hr);tb.appendChild(th);
+  const body=el("tbody");
+  groups.sort((a,b)=>dayNum(a.date)-dayNum(b.date)||GROUPS.findIndex(g=>g.title===a.campus)-GROUPS.findIndex(g=>g.title===b.campus)).forEach(x=>{
+    const r=el("tr");
+    r.append(el("td",x.campus),el("td",x.date),el("td",String(x.c.t),"num"),el("td",String(x.c.n-x.c.t),"num"),el("td",String(x.c.n),"num"));
+    body.appendChild(r);
+  });
+  tb.appendChild(body);tv.appendChild(tb);root.appendChild(tv);
+
+  root.appendChild(el("div","designed intentionally · @morethancables","d-foot"));
+}
+
 // ---------- wiring ----------
 $("fc").onchange=e=>{F.campus=e.target.value;fillDates();renderAll()};
 $("fd").onchange=e=>{F.date=e.target.value;renderAll()};
 $("fs").onchange=e=>{F.status=e.target.value;renderAll()};
 $("fq").oninput=e=>{F.q=e.target.value.trim();renderAll()};
 $("tabSlots").onclick=()=>{tab="slots";renderAll()};
+$("tabDash").onclick=()=>{tab="dash";renderAll();refreshFeed()};
 $("tabFeed").onclick=()=>{tab="feed";renderAll();refreshFeed()};
 $("unlock").onclick=()=>unlock(false);
 $("key").addEventListener("keydown",e=>{if(e.key==="Enter")unlock(false)});
