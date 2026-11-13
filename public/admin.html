@@ -977,7 +977,11 @@ function refreshMenus(){renderBuilder();renderSetup()}
 async function saveOpt(next,msg){
   const res=await adm("setOptions",{options:next});
   if(!res)return false;
-  if(res.status!==200){toast("Couldn't save");return false}
+  if(res.status!==200){
+    const e=res.data&&res.data.error;
+    toast(e==="bad_request"?"Not saved: the server is out of date. Update worker.js on GitHub and wait for the build.":e==="bad_options"?"Not saved: a name is empty or too long.":"Couldn't save (error "+res.status+")");
+    return false;
+  }
   OPT=res.data.options;optSaved=true;optJson=JSON.stringify(OPT);toast(msg);refreshMenus();refreshFeed();return true;
 }
 const CATS=["Audio","Video","Media","Lighting","Stage","Other"];
