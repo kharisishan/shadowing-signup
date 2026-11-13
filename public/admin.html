@@ -795,6 +795,7 @@ function parseDate(t){
   return {date:ord(dn)+" "+MONTHS[mi]+(m[3]?" "+m[3]:""),day:d.getFullYear()+"-"+pad2(mi+1)+"-"+pad2(dn)};
 }
 function parseTime(t){
+  if(t.indexOf("&")>-1){const ps=t.split("&").map(x=>parseTime(x));return ps.length>1&&ps.every(x=>x)?ps.join(" & "):null}
   const m=/^(\d{1,2})(?::(\d{2}))?\s*([ap])\.?m\.?$/i.exec(t.trim());
   if(!m)return null;
   const h=+m[1];if(h<1||h>12||(m[2]&&+m[2]>59))return null;
@@ -942,7 +943,8 @@ function renderSessions(){
       const rs=el("button","Remove this session","danger sm");rs.type="button";
       rs.onclick=()=>removeIds(ss.map(s=>s.id),"all "+ss.length+" slots on "+g.title+" · "+d.d);
       const cp2=el("button","Copy to another date","add sm");cp2.type="button";cp2.onclick=()=>copyDay(g.title,d);
-      tools.append(ad,cp2,rs);inn.appendChild(tools);
+      const mgb=el("button","Merge times into one slot","add sm");mgb.type="button";mgb.onclick=()=>mergeDay(g.title,d);
+      tools.append(ad,cp2,mgb,rs);inn.appendChild(tools);
       ss.forEach(s=>{
         const c=claims[s.id],row=el("div",null,"row"),left=el("div");
         left.appendChild(el("div",slotText(s)));
@@ -965,7 +967,7 @@ $("sessPast").onclick=()=>{const t=todayISO(),ids=SLOTS.filter(s=>s.day<t).map(s
 
 // ---------- menus (Setup) ----------
 let OPT={campuses:[],times:[],roles:[],codes:{},cats:{}},optSaved=false,optJson="";
-const timeKey=t=>{const m=/^(\d{1,2})(?::(\d{2}))?\s*([AP])M$/.exec(t);if(!m)return 9999;return ((+m[1]%12)+(m[3]==="P"?12:0))*60+(+m[2]||0)};
+const timeKey=t=>{const m=/^(\d{1,2})(?::(\d{2}))?\s*([AP])M/.exec(t);if(!m)return 9999;return ((+m[1]%12)+(m[3]==="P"?12:0))*60+(+m[2]||0)};
 const deriveOpt=()=>({campuses:GROUPS.map(g=>g.title),times:[...new Set(SLOTS.map(s=>s.time).filter(Boolean))].sort((a,b)=>timeKey(a)-timeKey(b)),roles:[...new Set(SLOTS.map(s=>s.role))],codes:Object.fromEntries(GROUPS.map(g=>[g.title,autoCode(g.title)])),cats:{}});
 function takeOptions(d){
   const o=d.options&&Array.isArray(d.options.campuses)?d.options:null;
@@ -986,7 +988,9 @@ async function saveOpt(next,msg){
 }
 const CATS=["Audio","Video","Media","Lighting","Stage","Other"];
 const autoCode=n=>{const w=n.replace(/[^A-Za-z0-9 ]/g," ").trim().split(/\s+/).filter(Boolean);return (w.length>1?w.map(x=>x[0]).join(""):(w[0]||"").slice(0,3)).toUpperCase().slice(0,4)};
-const periodOf=t=>{const k=timeKey(t);return k<720?"Morning":k<1020?"Afternoon":"Evening"};
+const isMerged=t=>t.indexOf(" & ")>-1;
+const mergeLabel=(a,b)=>timeKey(a)<=timeKey(b)?a+" & "+b:b+" & "+a;
+const periodOf=t=>{if(isMerged(t))return "Combined";const k=timeKey(t);return k<720?"Morning":k<1020?"Afternoon":"Evening"};
 const NSV="http://www.w3.org/2000/svg";
 function icon(shapes){
   const sv=document.createElementNS(NSV,"svg");
@@ -1035,6 +1039,21 @@ function renderSetup(){
     btn.onclick=go;
     [nm,cd].forEach(i=>i&&i.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();go()}}));
     card.appendChild(add);
+    if(k==="times"){
+      const singles=OPT.times.filter(t=>!isMerged(t));
+      if(singles.length>1){
+        card.appendChild(el("div","Combine two times into one slot (for example 9 AM & 11 AM)","help")).style.margin="-4px 0 8px";
+        const mg=el("div",null,"sp-add"),mk2=i=>{const sel=document.createElement("select");sel.style.flex="1 1 0";sel.setAttribute("aria-label","Time "+(i+1));singles.forEach(t=>{const o=el("option",t);o.value=t;sel.appendChild(o)});sel.value=singles[Math.min(i,singles.length-1)];return sel};
+        const a=mk2(0),b2=mk2(1),cb=el("button","combine");cb.type="button";
+        cb.onclick=async()=>{
+          if(a.value===b2.value){toast("Pick two different times");return}
+          const lbl=mergeLabel(a.value,b2.value);
+          if(OPT.times.includes(lbl)){toast(lbl+" is already in the list");return}
+          const next=clone();next.times.push(lbl);await saveOpt(next,"Added "+lbl);
+        };
+        mg.append(a,b2,cb);card.appendChild(mg);
+      }
+    }
 
     if(!OPT[k].length)card.appendChild(el("div","Nothing here yet. Add your first one above.","sp-empty"));
     OPT[k].forEach(v=>{
@@ -1173,6 +1192,35 @@ function renderRemoverPreview(){
 }
 [["rC","c"],["rD","d"],["rR","r"],["rT","t"]].forEach(([id,k])=>{$(id).onchange=e=>{R[k]=e.target.value;renderRemover()}});
 $("rGo").onclick=()=>{const m=SLOTS.filter(rMatch);if(m.length)removeIds(m.map(s=>s.id),m.length+" matching slot"+(m.length===1?"":"s"))};
+async function mergeDay(g,d){
+  const ss=SLOTS.filter(s=>s.campus===g&&s.date===d.d);
+  const times=[...new Set(ss.map(s=>s.time).filter(t=>t&&!isMerged(t)))].sort((a,b)=>timeKey(a)-timeKey(b));
+  if(times.length<2){toast("This date needs two different times to merge");return}
+  let pair=times.slice(0,2);
+  if(times.length>2){
+    const x=prompt("Which two times to merge? Options: "+times.join(", "),pair.join(", "));
+    if(x===null)return;
+    pair=x.split(",").map(t=>parseTime(t.trim())).filter(Boolean);
+    if(pair.length!==2||pair[0]===pair[1]||!pair.every(t=>times.includes(t))){toast("Pick two of: "+times.join(", "));return}
+  }
+  const lbl=mergeLabel(pair[0],pair[1]);
+  const roles=[...new Set(ss.map(s=>s.role))];
+  const ok=[],skip=[];
+  roles.forEach(r=>{
+    const a=ss.find(s=>s.role===r&&s.time===pair[0]),b=ss.find(s=>s.role===r&&s.time===pair[1]);
+    if(!a||!b)return;
+    if(claims[a.id]||claims[b.id])skip.push(r);else ok.push([a,b]);
+  });
+  if(!ok.length){toast(skip.length?"Every role already has a sign-up, so nothing can be merged":"No role has both "+pair.join(" and ")+" on this date");return}
+  if(!confirm("Merge "+pair[0]+" and "+pair[1]+" into one slot ("+lbl+") for "+ok.length+" role"+(ok.length===1?"":"s")+" on "+g+" · "+d.d+"?"+(skip.length?"\n\nSkipped because someone has signed up: "+skip.join(", ")+".":"")))return;
+  const add=await adm("setSessions",{mode:"add",slots:ok.map(([a])=>({campus:g,date:d.d,day:d.day,role:a.role,time:lbl}))});
+  if(!add||add.status!==200){if(add)toast("Couldn't merge");return}
+  const rm=await adm("removeSlots",{ids:ok.flatMap(([a,b])=>[a.id,b.id])});
+  if(!rm||rm.status!==200){if(rm)toast("Merged slots were added but the old ones couldn't be removed");return}
+  if(!OPT.times.includes(lbl)){const next=JSON.parse(JSON.stringify(OPT));next.times.push(lbl);await saveOpt(next,"Merged "+ok.length+" role"+(ok.length===1?"":"s")+" into "+lbl)}
+  else toast("Merged "+ok.length+" role"+(ok.length===1?"":"s")+" into "+lbl);
+  await loadSlots();refreshFeed();
+}
 async function copyDay(g,d){
   const t=prompt("Copy these slots to which date? (for example 6th December)");
   if(!t)return;
