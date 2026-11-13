@@ -4,10 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0a0a0b">
 <title>Shadow Sessions Admin</title>
 <style>
-:root{box-sizing:border-box;--bg:#f6f5f1;--card:#fff;--ink:#1c1b19;--mute:#6b6a65;--line:#e3e1da;--acc:#1f5eff;--accbg:#e8efff;--bad:#c0392b;--ok:#157a4b;--warn:#b26a00}
-@media (prefers-color-scheme:dark){:root{--bg:#141413;--card:#1e1e1c;--ink:#f1efe8;--mute:#a09e96;--line:#33322f;--acc:#6b95ff;--accbg:#1d2740;--bad:#ff7b6b;--ok:#5fd39a;--warn:#f0b35a}}
+:root{box-sizing:border-box;--bg:#f6f5f2;--card:#fff;--ink:#161616;--mute:#6b6a66;--line:#e3e1db;--acc:#7a5c1e;--accbg:#f1ece0;--btn:#161616;--btnink:#fff;--acc2:#161616;--bad:#b3392b;--ok:#2f7a54;--warn:#9a5b00}
+@media (prefers-color-scheme:dark){:root{--bg:#0a0a0b;--card:#141416;--ink:#ececea;--mute:#9b9a9f;--line:#27272b;--acc:#d6c696;--accbg:#1d1c18;--btn:#e6dfcb;--btnink:#111;--acc2:#e6dfcb;--bad:#ff8a78;--ok:#6fd3a0;--warn:#f0b35a}}
 *,*:before,*:after{box-sizing:inherit}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 main{max-width:820px;margin:0 auto;padding:20px 16px 56px}
@@ -19,14 +20,15 @@ h2 small.warn{color:var(--warn)}
 input,button,select{font:inherit;padding:9px 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
 input{flex:1;min-width:150px}
 select{flex:1;min-width:130px}
-button{cursor:pointer;background:var(--acc);color:#fff;border-color:var(--acc)}
+button{cursor:pointer;background:var(--btn);color:var(--btnink);border-color:var(--btn)}
 button.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
 button.sm{padding:5px 10px;font-size:.9rem}
 button.rel{background:transparent;color:var(--bad);border-color:var(--bad)}
 button.add{background:transparent;color:var(--acc);border-color:var(--acc)}
 .tabs{display:flex;gap:6px;margin-bottom:10px}
 .tabs button{background:transparent;color:var(--ink);border-color:var(--line)}
-.tabs button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.tabs button.on{background:var(--acc2);color:var(--btnink);border-color:var(--acc2)}
+.tabs{flex-wrap:wrap}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .chip{background:var(--card);border:1px solid var(--line);color:var(--ink);padding:6px 10px;border-radius:999px;font-size:.88rem;cursor:pointer}
 .chip.on{background:var(--accbg);border-color:var(--acc)}
@@ -44,18 +46,66 @@ button.add{background:transparent;color:var(--acc);border-color:var(--acc)}
 .count{color:var(--mute);font-size:.9rem;margin:4px 0 6px}
 #msg{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90%;text-align:center}
 #msg.on{opacity:1}
+textarea{font:.92rem/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%;min-height:130px;resize:vertical}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.card h2{margin-top:0}
+.help{color:var(--mute);font-size:.9rem;margin:0 0 10px}
+.help code,.pv code{background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:0 5px;font-size:.85em}
+.pv{margin:10px 0;font-size:.92rem}
+.pv .err{color:var(--bad)}
+.pv .okline{color:var(--ok)}
+.pv ul{margin:6px 0 0;padding-left:18px}
+button.danger{background:transparent;color:var(--bad);border-color:var(--bad)}
+button:disabled{opacity:.45;cursor:not-allowed}
+details.day{background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:6px}
+details.day>summary{cursor:pointer;padding:9px 12px;list-style-position:inside}
+details.day>summary small{color:var(--mute);margin-left:6px}
+details.day .in{padding:0 10px 10px}
+details.day .tools{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 8px}
+details.day .row{background:var(--bg)}
+.bstep{margin-bottom:16px}
+.bstep h3{font-size:.92rem;margin:0 0 6px}
+.bstep h3 span{display:inline-block;width:22px;height:22px;line-height:22px;text-align:center;border-radius:50%;background:var(--acc2);color:var(--btnink);font-size:.8rem;margin-right:6px}
+.brow{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.brow input[type=date],.brow input[type=time]{flex:0 1 170px;min-width:140px}
+.brow .grow{flex:1 1 140px}
+.chip.on:before{content:"\2713\00a0"}
+.chip.x:after{content:"\00a0\00d7";color:var(--mute)}
+details.adv{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:12px}
+details.adv>summary{cursor:pointer;font-weight:600}
+.sp-card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px 20px;margin-bottom:18px}
+.sp-head{display:flex;align-items:center;gap:10px;margin:0 0 18px;font:600 1rem/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.09em;text-transform:uppercase}
+.sp-head svg{width:22px;height:22px;color:var(--acc);flex:none}
+.sp-add{display:flex;gap:10px;margin-bottom:16px}
+.sp-add input,.sp-add select{padding:13px 14px;border-radius:12px;min-width:0}
+.sp-add input.nm{flex:1 1 auto}
+.sp-add input.cd{flex:0 0 96px;min-width:0;text-transform:uppercase}
+.sp-add select{flex:0 0 130px}
+.sp-add input[type=time]{flex:1 1 auto}
+.sp-add button{border-radius:12px;padding:0 22px;font-weight:600;flex:none}
+.sp-row{display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px}
+.sp-name{overflow-wrap:anywhere;font-size:1.02rem}
+.sp-tag{font:.8rem ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--acc);background:transparent;border:0;padding:0;cursor:pointer}
+select.sp-tag{color:var(--mute);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:4px 8px;max-width:140px}
+span.sp-tag{cursor:default;color:var(--mute);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:4px 10px}
+.sp-used{margin-left:auto;color:var(--mute);font-size:.8rem;white-space:nowrap}
+.sp-del{flex:none;width:38px;height:38px;padding:0;display:flex;align-items:center;justify-content:center;background:transparent;border:0;color:var(--bad);border-radius:10px}
+.sp-del:hover,.sp-del:focus-visible{background:rgba(192,57,43,.14)}
+.sp-del svg{width:20px;height:20px}
+.sp-empty{color:var(--mute);padding:4px 2px 14px}
+@media (max-width:520px){.sp-add input.cd{flex-basis:76px}.sp-add select{flex-basis:122px}.sp-add button{padding:0 16px}.sp-card{padding:18px 14px}.sp-row{flex-wrap:wrap;row-gap:6px}.sp-name{flex:1 1 100%}.sp-del{margin-left:0}}
 [hidden]{display:none!important}
 
-/* ---- dashboard (morethancables look: charcoal, white titles, teal-green accent) ---- */
+/* ---- dashboard (morethancables look: black, deep navy cards, blue marks) ---- */
 .dash{
   /* BRAND COLOURS: change these to match the official palette */
-  --d-bg:#12171a;--d-card:#1a2124;--d-line:#2a3336;--d-ink:#f3f6f5;--d-mute:#9aa8aa;
-  --d-acc:#34d3b1;--d-track:#243133;--d-warn:#e6b04a;
+  --d-bg:#0a0a0b;--d-card:#131315;--d-line:#26262a;--d-ink:#f2f1ed;--d-mute:#9d9ca3;
+  --d-acc:#cbb88a;--d-tint:#d9c9a0;--d-acc2:#cbb88a;--d-track:#232327;--d-warn:#e0866b;
   background:var(--d-bg);color:var(--d-ink);border-radius:16px;padding:18px;border:1px solid var(--d-line)}
 .dash *{min-width:0}
 .d-brand{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0 0 14px;color:var(--d-mute);font-size:.85rem}
 .d-brand b{color:var(--d-ink);font-size:1rem;letter-spacing:.01em}
-.d-brand b i{font-style:normal;color:var(--d-acc)}
+.d-brand b i{font-style:normal;color:var(--d-tint)}
 .d-top{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:10px;margin-bottom:10px}
 @media (max-width:620px){.d-top{grid-template-columns:1fr}}
 .d-card{background:var(--d-card);border:1px solid var(--d-line);border-radius:14px;padding:14px;margin-bottom:10px}
@@ -85,7 +135,7 @@ button.add{background:transparent;color:var(--acc);border-color:var(--acc)}
 .d-heat{display:grid;gap:2px}
 .d-heat .h{color:var(--d-mute);font-size:.75rem;text-align:center;padding:2px 0 6px;white-space:nowrap}
 .d-heat .r{color:var(--d-ink);font-size:.85rem;display:flex;align-items:center;padding-right:8px}
-button.d-cell{all:unset;box-sizing:border-box;display:flex;align-items:center;justify-content:center;height:44px;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer}
+button.d-cell{all:unset;box-sizing:border-box;border:1px solid var(--d-line);display:flex;align-items:center;justify-content:center;height:44px;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer}
 button.d-cell:hover,button.d-cell:focus-visible{outline:2px solid var(--d-ink);outline-offset:-2px}
 .d-cell.none{display:flex;align-items:center;justify-content:center;height:44px;border-radius:8px;background:transparent;border:1px dashed var(--d-line);color:var(--d-mute);cursor:default;font-weight:400;font-size:.88rem}
 .d-legend{display:flex;align-items:center;gap:8px;margin-top:10px;color:var(--d-mute);font-size:.78rem}
@@ -116,22 +166,22 @@ button.d-ring.on{border-color:var(--d-acc)}
 .d-score{display:grid;gap:6px}
 .d-srow{display:grid;grid-template-columns:34px minmax(80px,170px) minmax(0,1fr) 44px;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.025);border:1px solid transparent;outline-offset:2px}
 .d-srow:hover,.d-srow:focus-visible{border-color:var(--d-line)}
-.d-srow.top{background:rgba(52,211,177,.08)}
+.d-srow.top{background:rgba(203,184,138,.09)}
 .d-rank{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;color:var(--d-mute);border:1px solid var(--d-line)}
-.d-srow.top .d-rank{background:var(--d-acc);color:#04100e;border-color:var(--d-acc)}
+.d-srow.top .d-rank{background:var(--d-acc2);color:#0a0a0b;border-color:var(--d-acc2)}
 .d-sname{font-size:.98rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .d-srow.top .d-sname{font-weight:650}
 .d-sbar{height:10px;border-radius:4px;background:var(--d-track)}
 .d-sbar>i{display:block;height:100%;background:var(--d-acc);border-radius:0 4px 4px 0}
 .d-snum{text-align:right;font-size:1.35rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
 .d-snum small{display:block;font-size:.65rem;font-weight:400;color:var(--d-mute);margin-top:2px}
-.d-more{all:unset;cursor:pointer;color:var(--d-acc);font-size:.88rem;margin-top:10px;display:inline-block;border-radius:6px;outline-offset:3px}
-.d-more:focus-visible{outline:2px solid var(--d-acc)}
+.d-more{all:unset;cursor:pointer;color:var(--d-tint);font-size:.88rem;margin-top:10px;display:inline-block;border-radius:6px;outline-offset:3px}
+.d-more:focus-visible{outline:2px solid var(--d-tint)}
 @media (max-width:480px){.d-srow{grid-template-columns:30px minmax(0,1fr) 40px}.d-sbar{display:none}}
 .d-foot{text-align:center;color:var(--d-mute);font-size:.78rem;margin-top:14px}
-#tip{position:fixed;z-index:20;background:#0c1011;color:#f3f6f5;border:1px solid #2a3336;border-radius:10px;padding:8px 10px;font-size:.82rem;pointer-events:none;max-width:240px;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+#tip{position:fixed;z-index:20;background:#000;color:#f2f1ed;border:1px solid #2a2a2e;border-radius:10px;padding:8px 10px;font-size:.82rem;pointer-events:none;max-width:240px;box-shadow:0 6px 20px rgba(0,0,0,.35)}
 #tip .tv{font-weight:650;font-size:.95rem}
-#tip .ts{color:#9aa8aa}
+#tip .ts{color:#9d9ca3}
 </style>
 </head>
 <body>
@@ -148,9 +198,11 @@ button.d-ring.on{border-color:var(--d-acc)}
     <button id="tabSlots" class="on" type="button">Slots</button>
     <button id="tabDash" type="button">Dashboard</button>
     <button id="tabFeed" type="button">Activity</button>
+    <button id="tabSess" type="button">Manage sessions</button>
+    <button id="tabSetup" type="button">Setup</button>
   </div>
 
-  <div class="bar">
+  <div class="bar" id="filters">
     <select id="fc" aria-label="Campus"></select>
     <select id="fd" aria-label="Date"></select>
     <select id="fs" aria-label="Status"><option value="">All slots</option><option value="open">Open only</option><option value="taken">Taken only</option></select>
@@ -171,6 +223,59 @@ button.d-ring.on{border-color:var(--d-acc)}
 
   <div id="dashView" hidden><div class="dash" id="dash"></div></div>
 
+  <div id="setupView" hidden>
+    <p class="help">These are the menus used on <b>Manage sessions</b>. Add every campus, time and role you use once here, then just pick from them. Removing an item only takes it out of the menus; slots already created stay as they are.</p>
+    <div id="setupBody"></div>
+  </div>
+
+  <div id="sessView" hidden>
+    <div class="card">
+      <h2>Add sessions</h2>
+      <div class="bstep"><h3><span>1</span>Campus</h3>
+        <div class="brow"><select id="bCampus" class="grow" aria-label="Campus"></select></div></div>
+      <div class="bstep"><h3><span>2</span>Dates</h3>
+        <div class="brow"><input type="date" id="bDate" aria-label="Date"><input id="bNote" class="grow" maxlength="20" placeholder="Note, e.g. GPN (optional)"><button id="bDateAdd" class="add" type="button">Add date</button></div>
+        <div class="chips" id="bDates" style="margin:8px 0 0"></div></div>
+      <div class="bstep"><h3><span>3</span>Times <small style="font-weight:400;color:var(--mute)">tap to select</small></h3>
+        <div class="chips" id="bTimes" style="margin-bottom:6px"></div>
+</div>
+      <div class="bstep"><h3><span>4</span>Roles <small style="font-weight:400;color:var(--mute)">tap to select</small></h3>
+        <div class="chips" id="bRoles" style="margin-bottom:6px"></div>
+</div>
+      <div class="pv" id="bPv"></div>
+      <button id="bGo" type="button" disabled>Add sessions</button>
+      <p class="help" style="margin:10px 0 0">Every selected date, time and role is combined into slots. Existing sign-ups are never touched. Missing a campus, time or role? <button id="bSetup" class="add sm" type="button">Edit the menus in Setup</button></p>
+    </div>
+    <div class="card">
+      <h2>Remove sessions</h2>
+      <p class="help">Pick from the menus to find what to remove. Leave a menu on "All" to match everything.</p>
+      <div class="brow"><select id="rC" aria-label="Campus"></select><select id="rD" aria-label="Date"></select><select id="rR" aria-label="Role"></select><select id="rT" aria-label="Time"></select></div>
+      <div class="pv" id="rPv"></div>
+      <button id="rGo" class="danger" type="button" disabled>Remove</button>
+    </div>
+    <details class="adv"><summary>Advanced: paste a list or replace everything</summary>
+    <div style="margin-top:10px">
+      <h2 style="margin-top:0">Paste a list instead</h2>
+      <p class="help">One line per campus, in this order: <code>Campus | dates | times | roles</code>. Separate dates and times with commas, and roles with semicolons. Every date, time and role is combined, so the line below makes 2 dates × 1 time × 4 roles = 8 slots.</p>
+      <textarea id="sessText" spellcheck="false" placeholder="Subang | 6th December, 20th December | 5 PM | Lyrics; Sermon; Lyrics (Side Screens); Lights&#10;Putra | 6th December | 9 AM, 11 AM | Mac 1 Graphics &amp; Slides; Lights"></textarea>
+      <div class="pv" id="sessPv"></div>
+      <div class="bar" style="margin:0;padding:0;border:0;background:none">
+        <button id="sessAdd" type="button" disabled>Add these sessions</button>
+        <button id="sessRep" class="danger" type="button" disabled>Replace everything with this</button>
+        <button id="sessEx" class="ghost" type="button">Insert an example</button>
+      </div>
+      <p class="help" style="margin:10px 0 0"><b>Add</b> keeps everything that is already there and only adds new slots. <b>Replace</b> makes the list exactly what you typed: slots that are not in it are removed and their sign-ups cancelled. Use <b>Copy current sessions</b> below to start from what is live. Write a note in brackets after a date if you like, such as <code>21st October (GPN)</code>. The year is worked out for you and shown in the preview.</p>
+    </div>
+    </div>
+    </details>
+    <div class="bar">
+      <button class="ghost" id="sessCopy" type="button">Copy current sessions</button>
+      <button class="danger" id="sessPast" type="button" hidden></button>
+    </div>
+    <div class="count" id="sessCount"></div>
+    <div id="sessList"></div>
+  </div>
+
   <div id="feedView" hidden>
     <div class="count" id="feedcount"></div>
     <div class="feed" id="feed"></div>
@@ -179,26 +284,24 @@ button.d-ring.on{border-color:var(--d-acc)}
 <div id="msg" role="status"></div>
 <div id="tip" role="tooltip" hidden></div>
 <script>
-const FOUR=["Mac 1 Graphics & Slides","Mac 2 Lyrics & Sermon","Lights","Internal Livestream & Translations"];
-const mk=(names,times)=>names.map(n=>({n,t:times}));
-const day=(d,roles)=>({d,roles});
-// Putra/PJ: all four roles at 9 AM and 11 AM
-const std=d=>day(d,mk(FOUR,["9 AM","11 AM"]));
-const GROUPS=[
- {title:"Subang",days:["1st November","15th November"].map(d=>day(d,mk(["Lyrics","Sermon","Lyrics (Side Screens)","Lights"],["5 PM"])))},
- {title:"Mandarin",days:["1st November","8th November","15th November"].map(d=>day(d,mk(["Lyrics","Sermon","Lights"],["2 PM"])))},
- {title:"Putra",days:["1st November","8th November","15th November","22nd November"].map(std)},
- {title:"PJ",days:["1st November","8th November","22nd November"].map(std)}
-];
 const sid=(d,g,r,t)=>[d.replace(/\s*\(.*\)\s*$/,""),g,r,t].join("-").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/-$/,"");
 const $=id=>document.getElementById(id);
 
-// Flat list of every slot, plus a lookup by id (used to label the activity feed)
-const SLOTS=[],IDX={};
-GROUPS.forEach(g=>g.days.forEach(dy=>dy.roles.forEach(r=>r.t.forEach(t=>{
-  const s={id:sid(dy.d,g.title,r.n,t),campus:g.title,date:dy.d,role:r.n,time:t};SLOTS.push(s);IDX[s.id]=s;
-}))));
-const dayNum=d=>parseInt(d,10)||0;
+// The session list lives on the server. buildModel() turns it into the pieces the page uses.
+let SLOTS=[],IDX={},GROUPS=[],DAYN={},ver="";
+function buildModel(list){
+  SLOTS=list.slice().sort((a,b)=>a.day<b.day?-1:a.day>b.day?1:a.n-b.n);
+  IDX={};DAYN={};
+  const first={};
+  SLOTS.forEach(s=>{IDX[s.id]=s;DAYN[s.date]=s.day;if(first[s.campus]==null||s.n<first[s.campus])first[s.campus]=s.n});
+  const camps=Object.keys(first).sort((x,y)=>first[x]-first[y]);
+  GROUPS=camps.map(c=>{
+    const days=[];
+    SLOTS.filter(s=>s.campus===c).forEach(s=>{if(!days.some(d=>d.d===s.date))days.push({d:s.date,day:s.day})});
+    return {title:c,days};
+  });
+}
+const dayNum=d=>{const s=DAYN[d];return s?+s.replace(/-/g,""):0};
 const slotText=s=>s.role+(s.time?" ("+s.time+")":"");
 
 let claims={},feed=[],keyOk=false,tab="slots",sbAll=false;
@@ -210,9 +313,12 @@ function el(tag,text,cls){const e=document.createElement(tag);if(text!=null)e.te
 // ---------- server calls ----------
 async function loadSlots(){
   try{
-    const r=await fetch("/api/slots",{headers:{"x-token":"admin"}});
+    const r=await fetch("/api/slots"+(ver?"?v="+encodeURIComponent(ver):""),{headers:{"x-token":"admin"}});
     if(!r.ok)throw 0;
-    claims=(await r.json()).claims||{};
+    const d=await r.json();
+    claims=d.claims||{};
+    let model=false;if(d.slots){buildModel(d.slots);ver=d.v;fillFilters();model=true}
+    if(takeOptions(d)||model)refreshMenus();
   }catch(e){toast("Can't reach the server")}
   renderAll();
 }
@@ -317,7 +423,7 @@ function renderSlots(){
       row.appendChild(btns);root.appendChild(row);
     });
   });
-  if(!n)root.appendChild(el("div","Nothing matches these filters.","note"));
+  if(!n)root.appendChild(el("div",SLOTS.length?"Nothing matches these filters.":"No sessions yet. Add some on the Manage sessions tab.","note"));
   const total=SLOTS.length,taken=SLOTS.filter(s=>claims[s.id]).length;
   $("count").textContent="Showing "+n+" slots · "+taken+" of "+total+" taken overall";
 
@@ -351,9 +457,11 @@ function renderFeed(){
     if(l.action==="claim")what.append(el("b",name)," signed up");
     else if(l.action==="book")what.append("Admin booked ",el("b",name));
     else if(l.action==="rename")what.append("Admin renamed ",el("b",name));
+    else if(l.action==="removed")what.append("Slot removed, ",el("b",name),"'s sign-up cancelled");
+    else if(l.action==="config")what.append(name,el("span","sessions","tag"));
     else what.append(el("b",name),"'s slot was released");
     if(l.action==="release")what.appendChild(el("span",l.actor==="admin"?"by admin":"by volunteer","tag"));
-    what.appendChild(el("small",s?s.campus+" · "+s.date+" · "+slotText(s):l.slot));
+    if(l.slot)what.appendChild(el("small",s?s.campus+" · "+s.date+" · "+slotText(s):l.slot));
     row.append(what,el("div",whenText(l.at),"t"));
     root.appendChild(row);
   });
@@ -365,6 +473,11 @@ function renderAll(){
   $("tabSlots").className=tab==="slots"?"on":"";
   $("tabDash").className=tab==="dash"?"on":"";
   $("tabFeed").className=tab==="feed"?"on":"";
+  $("tabSess").className=tab==="sess"?"on":"";
+  $("sessView").hidden=tab!=="sess";
+  $("tabSetup").className=tab==="setup"?"on":"";
+  $("setupView").hidden=tab!=="setup";
+  $("filters").hidden=tab==="sess"||tab==="setup";
   $("slotsView").hidden=tab!=="slots";
   $("dashView").hidden=tab!=="dash";
   $("feedView").hidden=tab!=="feed";
@@ -372,6 +485,7 @@ function renderAll(){
   $("fq").hidden=tab==="dash";
   renderSlots();renderFeed();
   if(tab==="dash")renderDash();
+  if(tab==="sess")renderSessions();
 }
 
 // ---------- actions ----------
@@ -441,12 +555,12 @@ function download(name,text){
 
 
 // ---------- dashboard ----------
-const RAMP_LO=[36,49,51],RAMP_HI=[52,211,177];   // empty -> full (teal-green). Change with the CSS colours above.
+const RAMP_LO=[35,35,39],RAMP_HI=[203,184,138];   // empty -> full (charcoal to champagne). Change with the CSS colours above.
 const rampAt=t=>RAMP_LO.map((a,i)=>Math.round(a+(RAMP_HI[i]-a)*t));
 const rgb=c=>"rgb("+c.join(",")+")";
 const relLum=c=>{const f=v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)};return .2126*f(c[0])+.7152*f(c[1])+.0722*f(c[2])};
 const contrast=(a,b)=>{const x=relLum(a),y=relLum(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05)};
-const INK_LIGHT=[255,255,255],INK_DARK=[4,16,14];   // label colours; the page picks whichever contrasts more on each cell
+const INK_LIGHT=[242,241,237],INK_DARK=[10,10,11];   // label colours; the page picks whichever contrasts more on each cell
 const inkOn=c=>contrast(c,INK_LIGHT)>=contrast(c,INK_DARK)?rgb(INK_LIGHT):rgb(INK_DARK);
 const short=d=>d.replace(/(\d+)(?:st|nd|rd|th)\s+(\w{3})\w*/,"$1 $2");
 const cnt=a=>({t:a.filter(s=>claims[s.id]).length,n:a.length});
@@ -659,6 +773,413 @@ function renderDash(){
   root.appendChild(el("div","designed intentionally · @morethancables","d-foot"));
 }
 
+
+// ---------- manage sessions ----------
+const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const pad2=n=>String(n).padStart(2,"0");
+const ord=n=>n+((n%100>=11&&n%100<=13)?"th":(["th","st","nd","rd"][n%10]||"th"));
+const todayISO=()=>{const d=new Date();return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate())};
+const niceDay=iso=>{try{return new Date(iso+"T00:00:00").toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short",year:"numeric"})}catch(e){return iso}};
+
+// "1st November", "1 Nov", "21st October (GPN)"  ->  {date:"1st November", day:"2026-11-01"}
+function parseDate(t){
+  const m=/^(\d{1,2})(?:st|nd|rd|th)?\s+([A-Za-z]{3,9})\.?\s*(\([^)]*\))?$/.exec(t.trim());
+  if(!m)return null;
+  const mi=MONTHS.findIndex(x=>x.toLowerCase().startsWith(m[2].toLowerCase()));
+  const dn=+m[1];if(mi<0)return null;
+  const now=new Date();now.setHours(0,0,0,0);
+  const mk=y=>new Date(y,mi,dn);
+  let d=mk(now.getFullYear());
+  if(d<new Date(now.getTime()-45*864e5))d=mk(now.getFullYear()+1);   // a date more than ~6 weeks ago means next year
+  if(d.getMonth()!==mi||d.getDate()!==dn)return null;
+  return {date:ord(dn)+" "+MONTHS[mi]+(m[3]?" "+m[3]:""),day:d.getFullYear()+"-"+pad2(mi+1)+"-"+pad2(dn)};
+}
+function parseTime(t){
+  const m=/^(\d{1,2})(?::(\d{2}))?\s*([ap])\.?m\.?$/i.exec(t.trim());
+  if(!m)return null;
+  const h=+m[1];if(h<1||h>12||(m[2]&&+m[2]>59))return null;
+  return h+(m[2]&&m[2]!=="00"?":"+m[2]:"")+" "+m[3].toUpperCase()+"M";
+}
+function parseText(text){
+  const slots=[],errors=[],seen=new Set();
+  text.split(/\r?\n/).forEach((raw,i)=>{
+    const line=raw.trim();if(!line||line[0]==="#")return;
+    const at="Line "+(i+1)+": ";
+    const p=line.split("|").map(x=>x.trim());
+    if(p.length!==4){errors.push(at+"use  Campus | dates | times | roles");return}
+    const campus=p[0].replace(/\s+/g," ");let bad=false;
+    if(!campus||campus.length>40){errors.push(at+"campus name is missing or too long");return}
+    const dates=[],times=[],roles=[];
+    p[1].split(",").map(x=>x.trim()).filter(Boolean).forEach(x=>{const d=parseDate(x);if(d)dates.push(d);else{errors.push(at+"can't read the date \""+x+"\" (try 1st November)");bad=true}});
+    if(!p[1].trim()){errors.push(at+"add at least one date");bad=true}
+    if(p[2].trim())p[2].split(",").map(x=>x.trim()).filter(Boolean).forEach(x=>{const t=parseTime(x);if(t!=null)times.push(t);else{errors.push(at+"can't read the time \""+x+"\" (try 9 AM or 5:30 PM)");bad=true}});
+    else times.push("");
+    p[3].split(";").map(x=>x.replace(/\s+/g," ").trim()).filter(Boolean).forEach(x=>{if(x.length>60){errors.push(at+"role name too long: "+x);bad=true}else roles.push(x)});
+    if(!roles.length){errors.push(at+"add at least one role");bad=true}
+    if(bad)return;
+    dates.forEach(d=>roles.forEach(r=>times.forEach(t=>{
+      const id=sid(d.date,campus,r,t);if(seen.has(id))return;seen.add(id);
+      slots.push({id,campus,date:d.date,day:d.day,role:r,time:t});
+    })));
+  });
+  if(slots.length>600)errors.push("That is "+slots.length+" slots. Please add at most 600 at a time.");
+  return {slots,errors};
+}
+
+function renderPreview(){
+  const pv=$("sessPv");pv.textContent="";
+  const text=$("sessText").value;
+  const {slots,errors}=parseText(text);
+  const add=$("sessAdd"),rp=$("sessRep");
+  add.disabled=rp.disabled=true;
+  if(!text.trim()){pv.appendChild(el("span","The preview appears here as you type.","help"));return}
+  if(errors.length){
+    const u=el("ul");errors.forEach(e=>u.appendChild(el("li",e,"err")));
+    pv.append(el("div","Please fix this first:","err"),u);return;
+  }
+  const fresh=slots.filter(s=>!IDX[s.id]).length,have=slots.length-fresh;
+  pv.appendChild(el("div",slots.length+" slots: "+fresh+" new"+(have?", "+have+" already exist":""),"okline"));
+  const g=new Map();
+  slots.forEach(s=>{const k=s.campus+" · "+s.date+" · "+niceDay(s.day);g.set(k,(g.get(k)||0)+1)});
+  const u=el("ul");[...g].slice(0,40).forEach(([k,n])=>u.appendChild(el("li",k+" — "+n+(n===1?" slot":" slots"))));
+  if(g.size>40)u.appendChild(el("li","… and "+(g.size-40)+" more sessions"));
+  pv.appendChild(u);
+  const keep=new Set(slots.map(s=>s.id));
+  const drop=SLOTS.filter(s=>!keep.has(s.id)),lost=drop.filter(s=>claims[s.id]).length;
+  pv.appendChild(el("div","Replace would remove "+drop.length+" existing slot"+(drop.length===1?"":"s")+(lost?" and cancel "+lost+" sign-up"+(lost===1?"":"s"):"")+".","help")).style.marginTop="8px";
+  add.disabled=!fresh;rp.disabled=!slots.length;
+  add.textContent=fresh?"Add "+fresh+" new slot"+(fresh===1?"":"s"):"Nothing new to add";
+}
+const payload=a=>a.map(s=>({campus:s.campus,date:s.date,day:s.day,role:s.role,time:s.time}));
+async function doAdd(){
+  const {slots,errors}=parseText($("sessText").value);
+  if(errors.length||!slots.length)return;
+  const res=await adm("setSessions",{mode:"add",slots:payload(slots)});
+  if(!res)return;
+  if(res.status!==200){toast("Couldn't add sessions");return}
+  toast("Added "+res.data.added+" new slot"+(res.data.added===1?"":"s"));
+  $("sessText").value="";await loadSlots();refreshFeed();
+}
+async function doReplace(){
+  const {slots,errors}=parseText($("sessText").value);
+  if(errors.length||!slots.length)return;
+  const keep=new Set(slots.map(s=>s.id)),drop=SLOTS.filter(s=>!keep.has(s.id)),lost=drop.filter(s=>claims[s.id]);
+  if(!confirm("Replace the whole session list with these "+slots.length+" slots?\n\nThis removes "+drop.length+" existing slot(s) and cancels "+lost.length+" sign-up(s)."+(lost.length?"\n\nTip: press Export CSV on the Slots tab first if you want a record.":"")+"\n\nThis can't be undone."))return;
+  const res=await adm("setSessions",{mode:"replace",slots:payload(slots)});
+  if(!res)return;
+  if(res.status!==200){toast("Couldn't replace sessions");return}
+  toast("Done: "+res.data.added+" added, "+res.data.removed+" removed");
+  $("sessText").value="";await loadSlots();refreshFeed();
+}
+
+// current list as text in the same format (so it can be edited and pasted back)
+function sessionsAsText(){
+  const lines=[];
+  GROUPS.forEach(g=>{
+    const m=new Map();
+    g.days.forEach(d=>{
+      const ss=SLOTS.filter(s=>s.campus===g.title&&s.date===d.d);
+      const times=[...new Set(ss.map(s=>s.time))];
+      times.forEach(t=>{
+        const roles=[...new Set(ss.filter(s=>s.time===t).map(s=>s.role))];
+        const k=t+"|"+roles.join(";");
+        if(!m.has(k))m.set(k,{t,roles,dates:[]});
+        m.get(k).dates.push(d.d);
+      });
+    });
+    m.forEach(v=>lines.push([g.title,v.dates.join(", "),v.t,v.roles.join("; ")].join(" | ")));
+  });
+  return lines.join("\n");
+}
+
+const openDays=new Set();
+async function removeIds(ids,label){
+  const names=ids.filter(id=>claims[id]).map(id=>claims[id].name);
+  if(!confirm("Remove "+label+"?"+(names.length?"\n\nThis cancels "+names.length+" sign-up"+(names.length===1?"":"s")+": "+names.slice(0,8).join(", ")+(names.length>8?" …":""):"")+"\n\nThis can't be undone."))return;
+  let removed=0;
+  for(let i=0;i<ids.length;i+=500){
+    const res=await adm("removeSlots",{ids:ids.slice(i,i+500)});
+    if(!res)return;
+    if(res.status!==200){toast("Couldn't remove");break}
+    removed+=res.data.removed;
+  }
+  toast("Removed "+removed+" slot"+(removed===1?"":"s"));
+  await loadSlots();refreshFeed();
+}
+async function addOneSlot(g,d){
+  const role=(prompt("Role to add on "+g+" · "+d.d+":")||"").replace(/\s+/g," ").trim();
+  if(!role)return;
+  const last=SLOTS.filter(s=>s.campus===g&&s.date===d.d).map(s=>s.time).pop()||"";
+  const tin=prompt("Time (for example 9 AM). Leave empty for none:",last);
+  if(tin===null)return;
+  const time=tin.trim()?parseTime(tin):"";
+  if(time==null){toast("Couldn't read that time. Try 9 AM or 5:30 PM");return}
+  const res=await adm("setSessions",{mode:"add",slots:[{campus:g,date:d.d,day:d.day,role,time}]});
+  if(!res)return;
+  toast(res.status!==200?"Couldn't add":res.data.added?"Slot added":"That slot already exists");
+  await loadSlots();refreshFeed();
+}
+function renderSessions(){
+  renderPreview();renderRemoverPreview();
+  const root=$("sessList");root.textContent="";
+  const t=todayISO(),past=SLOTS.filter(s=>s.day<t);
+  const pb=$("sessPast");pb.hidden=!past.length;
+  pb.textContent="Remove past sessions ("+past.length+" slots)";
+  $("sessCount").textContent=SLOTS.length?SLOTS.length+" slots in "+GROUPS.length+" campus"+(GROUPS.length===1?"":"es")+" · "+SLOTS.filter(s=>claims[s.id]).length+" taken":"";
+  if(!SLOTS.length){root.appendChild(el("div","No sessions yet. Type some above and press Add.","note"));return}
+  GROUPS.forEach(g=>{
+    root.appendChild(el("h2",g.title));
+    g.days.forEach(d=>{
+      const ss=SLOTS.filter(s=>s.campus===g.title&&s.date===d.d),taken=ss.filter(s=>claims[s.id]).length;
+      const key=g.title+"|"+d.d;
+      const det=el("details",null,"day");det.open=openDays.has(key);
+      det.addEventListener("toggle",()=>{if(det.open)openDays.add(key);else openDays.delete(key)});
+      const sm=el("summary",d.d);
+      sm.appendChild(el("small",niceDay(d.day)+" · "+ss.length+(ss.length===1?" slot":" slots")+" · "+taken+" taken"+(d.day<t?" · past":"")));
+      det.appendChild(sm);
+      const inn=el("div",null,"in"),tools=el("div",null,"tools");
+      const ad=el("button","Add a slot","add sm");ad.type="button";ad.onclick=()=>addOneSlot(g.title,d);
+      const rs=el("button","Remove this session","danger sm");rs.type="button";
+      rs.onclick=()=>removeIds(ss.map(s=>s.id),"all "+ss.length+" slots on "+g.title+" · "+d.d);
+      const cp2=el("button","Copy to another date","add sm");cp2.type="button";cp2.onclick=()=>copyDay(g.title,d);
+      tools.append(ad,cp2,rs);inn.appendChild(tools);
+      ss.forEach(s=>{
+        const c=claims[s.id],row=el("div",null,"row"),left=el("div");
+        left.appendChild(el("div",slotText(s)));
+        left.appendChild(el("small",c?"Taken by "+c.name:"Open",c?"who":"open"));
+        const b=el("button","Remove","danger sm");b.type="button";
+        b.onclick=()=>removeIds([s.id],slotText(s)+" on "+g.title+" · "+d.d);
+        row.append(left,b);inn.appendChild(row);
+      });
+      det.appendChild(inn);root.appendChild(det);
+    });
+  });
+}
+$("sessText").oninput=renderPreview;
+$("sessAdd").onclick=doAdd;
+$("sessRep").onclick=doReplace;
+$("sessEx").onclick=()=>{const ta=$("sessText");ta.value=(ta.value.trim()?ta.value.replace(/\s*$/,"\n"):"")+"Subang | 6th December, 20th December | 5 PM | Lyrics; Sermon; Lyrics (Side Screens); Lights";renderPreview();ta.focus()};
+$("sessCopy").onclick=async()=>{try{await navigator.clipboard.writeText(sessionsAsText());toast("Copied. Paste it into the box above to edit.")}catch(e){toast("Couldn't copy")}};
+$("sessPast").onclick=()=>{const t=todayISO(),ids=SLOTS.filter(s=>s.day<t).map(s=>s.id);if(ids.length)removeIds(ids,"all "+ids.length+" past slots")};
+
+
+// ---------- menus (Setup) ----------
+let OPT={campuses:[],times:[],roles:[],codes:{},cats:{}},optSaved=false,optJson="";
+const timeKey=t=>{const m=/^(\d{1,2})(?::(\d{2}))?\s*([AP])M$/.exec(t);if(!m)return 9999;return ((+m[1]%12)+(m[3]==="P"?12:0))*60+(+m[2]||0)};
+const deriveOpt=()=>({campuses:GROUPS.map(g=>g.title),times:[...new Set(SLOTS.map(s=>s.time).filter(Boolean))].sort((a,b)=>timeKey(a)-timeKey(b)),roles:[...new Set(SLOTS.map(s=>s.role))],codes:Object.fromEntries(GROUPS.map(g=>[g.title,autoCode(g.title)])),cats:{}});
+function takeOptions(d){
+  const o=d.options&&Array.isArray(d.options.campuses)?d.options:null;
+  if(o){o.codes=o.codes||{};o.cats=o.cats||{};optSaved=true;OPT=o}else if(!optSaved&&d.slots)OPT=deriveOpt();
+  OPT.times=OPT.times.slice().sort((a,b)=>timeKey(a)-timeKey(b));
+  const j=JSON.stringify(OPT);const changed=j!==optJson;optJson=j;return changed;
+}
+function refreshMenus(){renderBuilder();renderSetup()}
+async function saveOpt(next,msg){
+  const res=await adm("setOptions",{options:next});
+  if(!res)return false;
+  if(res.status!==200){toast("Couldn't save");return false}
+  OPT=res.data.options;optSaved=true;optJson=JSON.stringify(OPT);toast(msg);refreshMenus();refreshFeed();return true;
+}
+const CATS=["Audio","Video","Media","Lighting","Stage","Other"];
+const autoCode=n=>{const w=n.replace(/[^A-Za-z0-9 ]/g," ").trim().split(/\s+/).filter(Boolean);return (w.length>1?w.map(x=>x[0]).join(""):(w[0]||"").slice(0,3)).toUpperCase().slice(0,4)};
+const periodOf=t=>{const k=timeKey(t);return k<720?"Morning":k<1020?"Afternoon":"Evening"};
+const NSV="http://www.w3.org/2000/svg";
+function icon(shapes){
+  const sv=document.createElementNS(NSV,"svg");
+  [["viewBox","0 0 24 24"],["fill","none"],["stroke","currentColor"],["stroke-width","1.8"],["stroke-linecap","round"],["stroke-linejoin","round"],["aria-hidden","true"]].forEach(([k,v])=>sv.setAttribute(k,v));
+  shapes.forEach(([t,a])=>{const n=document.createElementNS(NSV,t);for(const k in a)n.setAttribute(k,a[k]);sv.appendChild(n)});return sv;
+}
+const IC={
+  campuses:[["path",{d:"M3 21h18M5 21V8l7-4 7 4v13M9 21v-5h6v5M9 11h.01M15 11h.01"}]],
+  times:[["circle",{cx:12,cy:12,r:9}],["path",{d:"M12 7v5l3 2"}]],
+  roles:[["rect",{x:3,y:7,width:18,height:13,rx:2}],["path",{d:"M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"}]],
+  trash:[["path",{d:"M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"}]]
+};
+function renderSetup(){
+  const root=$("setupBody");root.textContent="";
+  const clone=()=>JSON.parse(JSON.stringify(OPT));
+  const cfg=[
+    {k:"campuses",title:"Manage campuses",use:s=>s.campus},
+    {k:"times",title:"Manage times",use:s=>s.time},
+    {k:"roles",title:"Manage roles",use:s=>s.role}
+  ];
+  cfg.forEach(c=>{
+    const k=c.k,card=el("div",null,"sp-card");
+    const h=el("h2",null,"sp-head");h.append(icon(IC[k]),c.title+" ("+OPT[k].length+")");card.appendChild(h);
+
+    // add row
+    const add=el("div",null,"sp-add");
+    const nm=document.createElement("input");
+    let cd=null,ct=null;
+    if(k==="times"){nm.type="time";nm.setAttribute("aria-label","Time to add")}
+    else{nm.className="nm";nm.maxLength=k==="campuses"?40:60;nm.placeholder=k==="campuses"?"campus name":"role name";nm.setAttribute("aria-label",nm.placeholder)}
+    nm.dataset.add=k;add.appendChild(nm);
+    if(k==="campuses"){cd=document.createElement("input");cd.className="cd";cd.maxLength=5;cd.placeholder="code";cd.setAttribute("aria-label","Campus code");add.appendChild(cd)}
+    if(k==="roles"){ct=document.createElement("select");ct.setAttribute("aria-label","Category");CATS.forEach(x=>{const o=el("option",x.toLowerCase());o.value=x;ct.appendChild(o)});const none=el("option","category");none.value="";ct.insertBefore(none,ct.firstChild);ct.value="";add.appendChild(ct)}
+    const btn=el("button","add");btn.type="button";add.appendChild(btn);
+    const go=async()=>{
+      let v;
+      if(k==="times"){if(!nm.value){toast("Pick a time first");return}const [hh,mi]=nm.value.split(":").map(Number);v=((hh%12)||12)+(mi?":"+pad2(mi):"")+" "+(hh>=12?"PM":"AM")}
+      else v=nm.value.replace(/\s+/g," ").trim();
+      if(!v)return;
+      if(OPT[k].some(x=>x.toLowerCase()===v.toLowerCase())){toast(v+" is already in the list");return}
+      const next=clone();next[k].push(v);
+      if(k==="campuses")next.codes[v]=cd.value.toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,5)||autoCode(v);
+      if(k==="roles"&&ct.value)next.cats[v]=ct.value;
+      if(await saveOpt(next,"Added "+v)){const again=$("setupBody").querySelector('input[data-add="'+k+'"]');if(again)again.focus()}
+    };
+    btn.onclick=go;
+    [nm,cd].forEach(i=>i&&i.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();go()}}));
+    card.appendChild(add);
+
+    if(!OPT[k].length)card.appendChild(el("div","Nothing here yet. Add your first one above.","sp-empty"));
+    OPT[k].forEach(v=>{
+      const n=SLOTS.filter(s=>c.use(s)===v).length;
+      const row=el("div",null,"sp-row");
+      row.appendChild(el("span",v,"sp-name"));
+      if(k==="campuses"){
+        const t=el("button",OPT.codes[v]?"["+OPT.codes[v]+"]":"+ code","sp-tag");t.type="button";t.title="Change the code";
+        t.onclick=async()=>{const x=prompt("Short code for "+v+":",OPT.codes[v]||autoCode(v));if(x===null)return;const next=clone();const cc=x.toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,5);if(cc)next.codes[v]=cc;else delete next.codes[v];await saveOpt(next,"Saved")};
+        row.appendChild(t);
+      }else if(k==="times"){
+        row.appendChild(el("span",periodOf(v),"sp-tag"));
+      }else{
+        const t=document.createElement("select");t.className="sp-tag";t.setAttribute("aria-label","Category for "+v);
+        const none=el("option","no category");none.value="";t.appendChild(none);
+        CATS.forEach(x=>{const o=el("option",x);o.value=x;t.appendChild(o)});
+        t.value=OPT.cats[v]||"";
+        t.onchange=async()=>{const next=clone();if(t.value)next.cats[v]=t.value;else delete next.cats[v];await saveOpt(next,"Saved")};
+        row.appendChild(t);
+      }
+      row.appendChild(el("span",n?n+(n===1?" slot":" slots"):"unused","sp-used"));
+      const del=el("button",null,"sp-del");del.type="button";del.setAttribute("aria-label","Remove "+v);del.title="Remove";del.appendChild(icon(IC.trash));
+      del.onclick=async()=>{
+        if(n&&!confirm(v+" is used in "+n+" existing slot"+(n===1?"":"s")+". They stay as they are, but "+v+" will no longer appear in the menus. Continue?"))return;
+        const next=clone();next[k]=next[k].filter(x=>x!==v);delete next.codes[v];delete next.cats[v];await saveOpt(next,"Removed "+v);
+      };
+      row.appendChild(del);card.appendChild(row);
+    });
+    root.appendChild(card);
+  });
+}
+
+// ---------- guided builder (menus) ----------
+const B={campus:"",dates:[],times:new Set(),roles:new Set()};
+function chipBtn(label,on,fn,cls){const c=el("button",label,"chip"+(on?" on":"")+(cls?" "+cls:""));c.type="button";c.setAttribute("aria-pressed",on?"true":"false");c.onclick=fn;return c}
+function renderBuilder(){
+  const sel=$("bCampus");sel.textContent="";
+  const ph=el("option",OPT.campuses.length?"Choose a campus…":"Add campuses in Setup first");ph.value="";sel.appendChild(ph);
+  OPT.campuses.forEach(c=>{const o=el("option",c);o.value=c;sel.appendChild(o)});
+  if(B.campus&&!OPT.campuses.includes(B.campus))B.campus="";
+  sel.value=B.campus;
+  B.times=new Set([...B.times].filter(t=>OPT.times.includes(t)));
+  B.roles=new Set([...B.roles].filter(r=>OPT.roles.includes(r)));
+
+  const dc=$("bDates");dc.textContent="";
+  if(!B.dates.length)dc.appendChild(el("span","No dates added yet.","help"));
+  B.dates.forEach(d=>dc.appendChild(chipBtn(d.date+" · "+niceDay(d.day),false,()=>{B.dates=B.dates.filter(x=>x!==d);renderBuilder()},"x")));
+
+  const tc=$("bTimes");tc.textContent="";
+  if(!OPT.times.length)tc.appendChild(el("span","No times yet. Add them in Setup.","help"));
+  OPT.times.forEach(t=>tc.appendChild(chipBtn(t,B.times.has(t),()=>{B.times.has(t)?B.times.delete(t):B.times.add(t);renderBuilder()})));
+
+  const rc=$("bRoles");rc.textContent="";
+  if(!OPT.roles.length)rc.appendChild(el("span","No roles yet. Add them in Setup.","help"));
+  OPT.roles.forEach(r=>rc.appendChild(chipBtn(r,B.roles.has(r),()=>{B.roles.has(r)?B.roles.delete(r):B.roles.add(r);renderBuilder()})));
+  builderPreview();renderRemover();
+}
+function builderSlots(){
+  const campus=B.campus,need=[];
+  if(!campus)need.push("a campus");
+  if(!B.dates.length)need.push("a date");
+  if(!B.roles.size)need.push("a role");
+  const slots=[],seen=new Set(),ts=B.times.size?[...B.times]:[""];
+  if(!need.length)B.dates.forEach(d=>[...B.roles].forEach(r=>ts.forEach(t=>{
+    const id=sid(d.date,campus,r,t);if(seen.has(id))return;seen.add(id);
+    slots.push({id,campus,date:d.date,day:d.day,role:r,time:t});
+  })));
+  return {slots,need,campus};
+}
+function builderPreview(){
+  const pv=$("bPv");pv.textContent="";const go=$("bGo");go.disabled=true;go.textContent="Add sessions";
+  const {slots,need}=builderSlots();
+  if(need.length){pv.appendChild(el("span","Still needed: "+need.join(", ")+".","help"));return}
+  const fresh=slots.filter(s=>!IDX[s.id]).length,have=slots.length-fresh;
+  pv.appendChild(el("div",slots.length+" slots: "+fresh+" new"+(have?", "+have+" already exist":"")+(B.times.size?"":" (no time set)"),"okline"));
+  const g=new Map();slots.forEach(s=>{const k=s.campus+" · "+s.date+" · "+niceDay(s.day);g.set(k,(g.get(k)||0)+1)});
+  const u=el("ul");[...g].slice(0,30).forEach(([k,n])=>u.appendChild(el("li",k+" — "+n+(n===1?" slot":" slots"))));
+  pv.appendChild(u);
+  if(fresh){go.disabled=false;go.textContent="Add "+fresh+" new slot"+(fresh===1?"":"s")}
+}
+$("bCampus").onchange=e=>{
+  B.campus=e.target.value;
+  // start from what this campus used last time (only items still in the menus)
+  if(B.campus&&!B.times.size&&!B.roles.size){
+    const mine=SLOTS.filter(s=>s.campus===B.campus);
+    if(mine.length){
+      const last=mine.reduce((m,s)=>s.day>m?s.day:m,"");
+      mine.filter(s=>s.day===last).forEach(s=>{if(s.time&&OPT.times.includes(s.time))B.times.add(s.time);if(OPT.roles.includes(s.role))B.roles.add(s.role)});
+    }
+  }
+  renderBuilder();
+};
+$("bDateAdd").onclick=()=>{
+  const v=$("bDate").value;if(!v){toast("Pick a date first");return}
+  const [y,m,d]=v.split("-").map(Number);
+  const note=$("bNote").value.replace(/[()]/g,"").replace(/\s+/g," ").trim();
+  const date=ord(d)+" "+MONTHS[m-1]+(note?" ("+note+")":"");
+  if(!B.dates.some(x=>x.date===date)){B.dates.push({date,day:v});B.dates.sort((a,b)=>a.day<b.day?-1:a.day>b.day?1:0)}
+  $("bDate").value="";$("bNote").value="";renderBuilder();
+};
+$("bGo").onclick=async()=>{
+  const {slots,need}=builderSlots();if(need.length||!slots.length)return;
+  const res=await adm("setSessions",{mode:"add",slots:payload(slots)});
+  if(!res)return;
+  if(res.status!==200){toast("Couldn't add sessions");return}
+  toast("Added "+res.data.added+" new slot"+(res.data.added===1?"":"s"));
+  B.dates=[];await loadSlots();refreshFeed();renderBuilder();
+};
+$("bSetup").onclick=()=>{tab="setup";renderAll();renderSetup();window.scrollTo(0,0)};
+
+// ---------- remove by menus ----------
+const R={c:"",d:"",r:"",t:""};
+const rMatch=s=>(!R.c||s.campus===R.c)&&(!R.d||s.date===R.d)&&(!R.r||s.role===R.r)&&(!R.t||(R.t==="__none"?s.time==="":s.time===R.t));
+function fillSel(id,all,opts,cur){
+  const sel=$(id);sel.textContent="";
+  const a=el("option",all);a.value="";sel.appendChild(a);
+  opts.forEach(([v,l])=>{const o=el("option",l);o.value=v;sel.appendChild(o)});
+  const ok=opts.some(([v])=>v===cur);sel.value=ok?cur:"";return sel.value;
+}
+function renderRemover(){
+  R.c=fillSel("rC","All campuses",GROUPS.map(g=>[g.title,g.title]),R.c);
+  const inC=SLOTS.filter(s=>!R.c||s.campus===R.c);
+  const dates=[];inC.forEach(s=>{if(!dates.some(x=>x[0]===s.date))dates.push([s.date,s.date+" · "+niceDay(s.day)])});
+  R.d=fillSel("rD","All dates",dates,R.d);
+  const inD=inC.filter(s=>!R.d||s.date===R.d);
+  R.r=fillSel("rR","All roles",[...new Set(inD.map(s=>s.role))].map(r=>[r,r]),R.r);
+  const ts=[...new Set(inD.map(s=>s.time))].sort((a,b)=>timeKey(a)-timeKey(b)).map(t=>t?[t,t]:["__none","No time"]);
+  R.t=fillSel("rT","All times",ts,R.t);
+  renderRemoverPreview();
+}
+function renderRemoverPreview(){
+  const pv=$("rPv");pv.textContent="";
+  const m=SLOTS.filter(rMatch),tk=m.filter(s=>claims[s.id]);
+  const go=$("rGo");go.disabled=!m.length;go.textContent=m.length?"Remove "+m.length+" slot"+(m.length===1?"":"s"):"Nothing to remove";
+  pv.appendChild(el("div",m.length+" slot"+(m.length===1?"":"s")+" match"+(tk.length?", "+tk.length+" with a sign-up ("+tk.slice(0,5).map(s=>claims[s.id].name).join(", ")+(tk.length>5?" …":"")+")":""),m.length?"okline":"help"));
+}
+[["rC","c"],["rD","d"],["rR","r"],["rT","t"]].forEach(([id,k])=>{$(id).onchange=e=>{R[k]=e.target.value;renderRemover()}});
+$("rGo").onclick=()=>{const m=SLOTS.filter(rMatch);if(m.length)removeIds(m.map(s=>s.id),m.length+" matching slot"+(m.length===1?"":"s"))};
+async function copyDay(g,d){
+  const t=prompt("Copy these slots to which date? (for example 6th December)");
+  if(!t)return;
+  const nd=parseDate(t);if(!nd){toast("Can't read that date. Try 6th December");return}
+  const ss=SLOTS.filter(s=>s.campus===g&&s.date===d.d).map(s=>({campus:g,date:nd.date,day:nd.day,role:s.role,time:s.time}));
+  const res=await adm("setSessions",{mode:"add",slots:ss});
+  if(!res)return;
+  toast(res.status!==200?"Couldn't copy":"Copied: "+res.data.added+" new slot"+(res.data.added===1?"":"s")+" on "+nd.date);
+  await loadSlots();refreshFeed();
+}
+
 // ---------- wiring ----------
 $("fc").onchange=e=>{F.campus=e.target.value;fillDates();renderAll()};
 $("fd").onchange=e=>{F.date=e.target.value;renderAll()};
@@ -667,6 +1188,8 @@ $("fq").oninput=e=>{F.q=e.target.value.trim();renderAll()};
 $("tabSlots").onclick=()=>{tab="slots";renderAll()};
 $("tabDash").onclick=()=>{tab="dash";renderAll();refreshFeed()};
 $("tabFeed").onclick=()=>{tab="feed";renderAll();refreshFeed()};
+$("tabSess").onclick=()=>{tab="sess";renderAll();refreshFeed()};
+$("tabSetup").onclick=()=>{tab="setup";renderAll();renderSetup()};
 $("unlock").onclick=()=>unlock(false);
 $("key").addEventListener("keydown",e=>{if(e.key==="Enter")unlock(false)});
 $("reload").onclick=()=>{loadSlots();refreshFeed()};
@@ -674,7 +1197,7 @@ $("relall").onclick=releaseAll;
 $("copy").onclick=async()=>{try{await navigator.clipboard.writeText(summary());toast("Copied")}catch(e){toast("Couldn't copy")}};
 $("csv").onclick=()=>{try{download("shadow-signups.csv",csvText());toast("CSV downloaded")}catch(e){toast("Couldn't export")}};
 
-fillFilters();
+fillFilters();refreshMenus();
 try{const k=sessionStorage.getItem("adminkey");if(k){$("key").value=k;unlock(true)}}catch(e){}
 loadSlots();
 setInterval(()=>{if(!document.hidden){loadSlots();refreshFeed()}},15000);
