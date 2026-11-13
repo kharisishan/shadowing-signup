@@ -54,27 +54,33 @@ h2{font-size:1.1rem;margin:20px 0 8px}
 </main>
 <div id="msg" role="status"></div>
 <script>
-const FOUR=["Mac 1 Graphics & Slides","Mac 2 Lyrics & Sermon","Lights","Internal Livestream & Translations"];
-const mk=(names,times)=>names.map(n=>({n,t:times}));
-const day=(d,roles)=>({d,roles});
-// Putra/PJ: all four roles at 9 AM and 11 AM
-const std=d=>day(d,mk(FOUR,["9 AM","11 AM"]));
-const GROUPS=[
- {title:"Subang",days:["1st November","15th November"].map(d=>day(d,mk(["Lyrics","Sermon","Lyrics (Side Screens)","Lights"],["5 PM"])))},
- {title:"Mandarin",days:["1st November","8th November","15th November"].map(d=>day(d,mk(["Lyrics","Sermon","Lights"],["2 PM"])))},
- {title:"Putra",days:["1st November","8th November","15th November","22nd November"].map(std)},
- {title:"PJ",days:["1st November","8th November","22nd November"].map(std)}
-];
+// Sessions come from the server (managed on the admin page). Past dates are hidden.
+let SLOTS=[],GROUPS=[],ver="";
 const sid=(d,g,r,t)=>[d.replace(/\s*\(.*\)\s*$/,""),g,r,t].join("-").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/-$/,"");
 const $=id=>document.getElementById(id);
 const nm=$("nm"),dt=$("dt"),cp=$("cp");
-GROUPS.forEach(g=>cp.add(new Option(g.title,g.title)));
-function fillDate(){const prev=dt.value;dt.textContent="";const g=GROUPS.find(x=>x.title===cp.value);(g?g.days:[]).forEach(x=>dt.add(new Option(x.d,x.d)));if([...dt.options].some(o=>o.value===prev))dt.value=prev}
+const todayStr=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+function buildGroups(){
+  const t=todayStr(),gs=[];
+  SLOTS.filter(s=>s.day>=t).forEach(s=>{
+    let g=gs.find(x=>x.title===s.campus);if(!g)gs.push(g={title:s.campus,days:[]});
+    let d=g.days.find(x=>x.d===s.date);if(!d)g.days.push(d={d:s.date,day:s.day,roles:[]});
+    let r=d.roles.find(x=>x.n===s.role);if(!r)d.roles.push(r={n:s.role,t:[]});
+    r.t.push({t:s.time,id:s.id});
+  });
+  gs.forEach(g=>g.days.sort((a,b)=>a.day<b.day?-1:a.day>b.day?1:0));
+  GROUPS=gs;
+}
+function fillCampus(){
+  const prev=cp.value||saved("shadow-campus");cp.textContent="";
+  GROUPS.forEach(g=>cp.add(new Option(g.title,g.title)));
+  if(GROUPS.some(g=>g.title===prev))cp.value=prev;
+  fillDate();
+}
+function fillDate(){const prev=dt.value||saved("shadow-date");dt.textContent="";const g=GROUPS.find(x=>x.title===cp.value);(g?g.days:[]).forEach(x=>dt.add(new Option(x.d,x.d)));if([...dt.options].some(o=>o.value===prev))dt.value=prev}
+function saved(k){try{return localStorage.getItem(k)||""}catch(e){return ""}}
 function saveSel(){try{localStorage.setItem("shadow-date",dt.value);localStorage.setItem("shadow-campus",cp.value)}catch(e){}}
-try{const b=localStorage.getItem("shadow-campus");if(GROUPS.some(g=>g.title===b))cp.value=b}catch(e){}
-fillDate();
-try{const a=localStorage.getItem("shadow-date");if([...dt.options].some(o=>o.value===a))dt.value=a}catch(e){}
-cp.addEventListener("change",()=>{fillDate();saveSel();render()});
+cp.addEventListener("change",()=>{dt.value="";fillDate();saveSel();render()});
 dt.addEventListener("change",()=>{saveSel();render()});
 let claims={},busy=false,loaded=false,offline=false;
 
@@ -96,14 +102,15 @@ async function api(path,opts={}){
 
 function render(){
   const root=$("list");root.textContent="";
+  if(loaded&&!GROUPS.length){const e=document.createElement("div");e.className="role";e.textContent="No upcoming sessions are open right now. Please check back soon.";root.appendChild(e);return}
   GROUPS.filter(g=>g.title===cp.value).forEach(g=>{const day=g.days.find(x=>x.d===dt.value);if(!day)return;
     const h=document.createElement("h2");h.textContent=g.title+" · "+dt.value;root.appendChild(h);
     day.roles.forEach(r=>{
       const card=document.createElement("div");card.className="role";
       const b=document.createElement("b");b.textContent=r.n;card.appendChild(b);
       const o=document.createElement("div");o.className="opts";
-      r.t.forEach(t=>{
-        const id=sid(dt.value,g.title,r.n,t),c=claims[id];
+      r.t.forEach(({t,id})=>{
+        const c=claims[id];
         const btn=document.createElement("button");btn.className="slot";btn.type="button";
         const top=document.createElement("span");top.textContent=t||"Available";
         const sub=document.createElement("small");
@@ -125,9 +132,12 @@ function render(){
 
 async function refresh(){
   try{
-    const {status,data}=await api("slots");
+    const {status,data}=await api("slots"+(ver?"?v="+encodeURIComponent(ver):""));
     if(status!==200)throw 0;
     claims=data.claims||{};loaded=true;
+    if(data.slots){SLOTS=data.slots;ver=data.v}
+    buildGroups();
+    if(data.slots||!cp.options.length)fillCampus();
     if(offline){offline=false;note("")}
   }catch(e){offline=true;note("Can't reach the server. Retrying…")}
   render();
