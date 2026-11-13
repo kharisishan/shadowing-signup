@@ -94,6 +94,21 @@ span.sp-tag{cursor:default;color:var(--mute);background:var(--card);border:1px s
 .sp-del svg{width:20px;height:20px}
 .sp-empty{color:var(--mute);padding:4px 2px 14px}
 @media (max-width:520px){.sp-add input.cd{flex-basis:76px}.sp-add select{flex-basis:122px}.sp-add button{padding:0 16px}.sp-card{padding:18px 14px}.sp-row{flex-wrap:wrap;row-gap:6px}.sp-name{flex:1 1 100%}.sp-del{margin-left:0}}
+.cal{border:1px solid var(--line);border-radius:14px;padding:10px;background:var(--bg);max-width:390px}
+.cal-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.cal-h b{font-weight:600}
+.cal-h button{width:36px;height:34px;padding:0;background:transparent;color:var(--ink);border-color:var(--line)}
+.cal-g{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-w{font-size:.72rem;color:var(--mute);text-align:center;padding:2px 0}
+button.cal-d{background:transparent;color:var(--ink);border:1px solid transparent;border-radius:10px;padding:0;height:40px;position:relative;font-size:.95rem}
+button.cal-d:hover:not(:disabled){border-color:var(--mute)}
+button.cal-d.sun{color:var(--acc);font-weight:600}
+button.cal-d.today{border-color:var(--mute)}
+button.cal-d.sel{background:var(--btn);color:var(--btnink);border-color:var(--btn)}
+button.cal-d:disabled{opacity:.3;cursor:not-allowed}
+button.cal-d i{position:absolute;bottom:4px;left:50%;margin-left:-2.5px;width:5px;height:5px;border-radius:50%;background:var(--acc)}
+button.cal-d.sel i{background:var(--btnink)}
+.cal-k{color:var(--mute);font-size:.78rem;margin-top:8px}
 [hidden]{display:none!important}
 
 /* ---- dashboard (morethancables look: black, deep navy cards, blue marks) ---- */
@@ -233,8 +248,9 @@ button.d-ring.on{border-color:var(--d-acc)}
       <h2>Add sessions</h2>
       <div class="bstep"><h3><span>1</span>Campus</h3>
         <div class="brow"><select id="bCampus" class="grow" aria-label="Campus"></select></div></div>
-      <div class="bstep"><h3><span>2</span>Dates</h3>
-        <div class="brow"><input type="date" id="bDate" aria-label="Date"><input id="bNote" class="grow" maxlength="20" placeholder="Note, e.g. GPN (optional)"><button id="bDateAdd" class="add" type="button">Add date</button></div>
+      <div class="bstep"><h3><span>2</span>Dates <small style="font-weight:400;color:var(--mute)">tap days to select</small></h3>
+        <div class="cal" id="bCal"></div>
+        <div class="brow" style="margin-top:10px"><input id="bNote" class="grow" maxlength="20" placeholder="Optional note first, e.g. GPN, then tap the day"><button id="bSun" class="add sm" type="button">All Sundays</button><button id="bClr" class="ghost sm" type="button">Clear</button></div>
         <div class="chips" id="bDates" style="margin:8px 0 0"></div></div>
       <div class="bstep"><h3><span>3</span>Times <small style="font-weight:400;color:var(--mute)">tap to select</small></h3>
         <div class="chips" id="bTimes" style="margin-bottom:6px"></div>
@@ -1087,7 +1103,7 @@ function renderSetup(){
 }
 
 // ---------- guided builder (menus) ----------
-const B={campus:"",dates:[],times:new Set(),roles:new Set()};
+const B={campus:"",dates:[],times:new Set(),roles:new Set(),cal:null};
 function chipBtn(label,on,fn,cls){const c=el("button",label,"chip"+(on?" on":"")+(cls?" "+cls:""));c.type="button";c.setAttribute("aria-pressed",on?"true":"false");c.onclick=fn;return c}
 function renderBuilder(){
   const sel=$("bCampus");sel.textContent="";
@@ -1098,6 +1114,7 @@ function renderBuilder(){
   B.times=new Set([...B.times].filter(t=>OPT.times.includes(t)));
   B.roles=new Set([...B.roles].filter(r=>OPT.roles.includes(r)));
 
+  renderCal();
   const dc=$("bDates");dc.textContent="";
   if(!B.dates.length)dc.appendChild(el("span","No dates added yet.","help"));
   B.dates.forEach(d=>dc.appendChild(chipBtn(d.date+" · "+niceDay(d.day),false,()=>{B.dates=B.dates.filter(x=>x!==d);renderBuilder()},"x")));
@@ -1146,14 +1163,49 @@ $("bCampus").onchange=e=>{
   }
   renderBuilder();
 };
-$("bDateAdd").onclick=()=>{
-  const v=$("bDate").value;if(!v){toast("Pick a date first");return}
-  const [y,m,d]=v.split("-").map(Number);
-  const note=$("bNote").value.replace(/[()]/g,"").replace(/\s+/g," ").trim();
-  const date=ord(d)+" "+MONTHS[m-1]+(note?" ("+note+")":"");
-  if(!B.dates.some(x=>x.date===date)){B.dates.push({date,day:v});B.dates.sort((a,b)=>a.day<b.day?-1:a.day>b.day?1:0)}
-  $("bDate").value="";$("bNote").value="";renderBuilder();
+const isoOf=(y,m,d)=>y+"-"+pad2(m+1)+"-"+pad2(d);
+function noteText(){return $("bNote").value.replace(/[()]/g,"").replace(/\s+/g," ").trim()}
+function addDay(iso){
+  if(B.dates.some(x=>x.day===iso))return;
+  const [y,m,d]=iso.split("-").map(Number),note=noteText();
+  B.dates.push({date:ord(d)+" "+MONTHS[m-1]+(note?" ("+note+")":""),day:iso});
+  B.dates.sort((a,b)=>a.day<b.day?-1:a.day>b.day?1:0);
+}
+function renderCal(){
+  const root=$("bCal");root.textContent="";
+  const now=new Date(),today=isoOf(now.getFullYear(),now.getMonth(),now.getDate());
+  if(!B.cal)B.cal={y:now.getFullYear(),m:now.getMonth()};
+  const {y,m}=B.cal;
+  const head=el("div",null,"cal-h");
+  const nav=(txt,label,dm)=>{const b=el("button",txt);b.type="button";b.setAttribute("aria-label",label);b.onclick=()=>{let nm=B.cal.m+dm,ny=B.cal.y;if(nm<0){nm=11;ny--}if(nm>11){nm=0;ny++}B.cal={y:ny,m:nm};renderCal()};return b};
+  head.append(nav("‹","Previous month",-1),el("b",MONTHS[m]+" "+y),nav("›","Next month",1));
+  root.appendChild(head);
+  const g=el("div",null,"cal-g");
+  ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(w=>g.appendChild(el("div",w,"cal-w")));
+  const first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate();
+  for(let i=0;i<first;i++)g.appendChild(el("div"));
+  const busy=new Set(SLOTS.filter(s=>!B.campus||s.campus===B.campus).map(s=>s.day));
+  for(let d=1;d<=days;d++){
+    const iso=isoOf(y,m,d),dow=new Date(y,m,d).getDay(),sel=B.dates.some(x=>x.day===iso);
+    const b=el("button",String(d),"cal-d"+(dow===0?" sun":"")+(iso===today?" today":"")+(sel?" sel":""));
+    b.type="button";b.disabled=iso<today;b.setAttribute("aria-pressed",sel?"true":"false");
+    b.setAttribute("aria-label",niceDay(iso)+(sel?", selected":"")+(busy.has(iso)?", already has sessions":""));
+    if(busy.has(iso))b.appendChild(el("i"));
+    b.onclick=()=>{if(sel)B.dates=B.dates.filter(x=>x.day!==iso);else addDay(iso);renderBuilder()};
+    g.appendChild(b);
+  }
+  root.appendChild(g);
+  root.appendChild(el("div","Dot = already has sessions"+(B.campus?" at "+B.campus:"")+" · outlined = today","cal-k"));
+}
+$("bSun").onclick=()=>{
+  if(!B.cal)renderCal();
+  const {y,m}=B.cal,now=new Date(),today=isoOf(now.getFullYear(),now.getMonth(),now.getDate());
+  let n=0;
+  for(let d=1;d<=new Date(y,m+1,0).getDate();d++){const iso=isoOf(y,m,d);if(new Date(y,m,d).getDay()===0&&iso>=today&&!B.dates.some(x=>x.day===iso)){addDay(iso);n++}}
+  if(!n)toast("No more Sundays to add this month");
+  renderBuilder();
 };
+$("bClr").onclick=()=>{B.dates=[];renderBuilder()};
 $("bGo").onclick=async()=>{
   const {slots,need}=builderSlots();if(need.length||!slots.length)return;
   const res=await adm("setSessions",{mode:"add",slots:payload(slots)});
