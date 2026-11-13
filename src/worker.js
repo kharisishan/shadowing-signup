@@ -87,7 +87,7 @@ function cleanSlots(list) {
   for (const x of list) {
     if (!x || typeof x !== "object") return { error: "bad_slot" };
     const campus = clean(x.campus), date = clean(x.date), role = clean(x.role), time = clean(x.time), day = clean(x.day);
-    if (!campus || !date || !role || campus.length > 40 || date.length > 40 || role.length > 60 || time.length > 12) return { error: "bad_slot", bad: x };
+    if (!campus || !date || !role || campus.length > 40 || date.length > 40 || role.length > 60 || time.length > 24) return { error: "bad_slot", bad: x };
     const d = /^\d{4}-\d{2}-\d{2}$/.test(day) ? new Date(day + "T00:00:00Z") : null;
     if (!d || isNaN(d) || d.toISOString().slice(0, 10) !== day) return { error: "bad_slot", bad: x };
     const id = sid(date, campus, role, time);
@@ -204,7 +204,7 @@ async function handleApi(request, env) {
       // The menus used by the admin page: campuses, times and roles.
       if (body.action === "setOptions") {
         const o = body.options || {};
-        const lim = { campuses: 40, times: 12, roles: 60 };
+        const lim = { campuses: 40, times: 24, roles: 60 };
         const out = {};
         for (const k of Object.keys(lim)) {
           if (!Array.isArray(o[k]) || o[k].length > 100) return json({ error: "bad_options" }, 400);
