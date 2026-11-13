@@ -87,6 +87,11 @@ body{background-image:none}
 .dlg{width:100%;max-width:400px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:1.1rem;padding:26px 24px 22px;box-shadow:0 24px 60px -20px rgba(0,0,0,.6);animation:zoomIn .25s var(--ease) both;max-height:calc(100vh - 40px);overflow:auto}
 .dlg .tick{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--okbg);color:var(--ok);margin-bottom:12px}
 .dlg .tick svg{width:24px;height:24px}
+.dlg .tick.open{background:var(--accbg);color:var(--acc)}
+.dlg .row2{display:flex;gap:10px}
+.dlg .row2 button{flex:1 1 0}
+.dlg button.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.dlg .follow+.follow{margin-top:-10px}
 .dlg .mine-slot{margin:0 0 14px;color:var(--mute);font-size:.88rem;overflow-wrap:anywhere}
 .dlg h2{margin:0 0 8px;font-size:1.15rem}
 .dlg ul{margin:0 0 14px;padding-left:20px}
@@ -113,6 +118,25 @@ body{background-image:none}
   <div id="list"></div>
 </main>
 <div id="msg" role="status"></div>
+<div id="ask" class="ov" hidden>
+  <div class="dlg" role="alertdialog" aria-modal="true" aria-labelledby="askT">
+    <div class="tick open" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 7.5-2"/></svg></div>
+    <p class="mine-slot" id="askSlot"></p>
+    <h2 id="askT">Release this slot?</h2>
+    <p class="follow">Releasing opens it up for anyone to book, on a first come, first served basis.</p>
+    <div class="row2"><button id="askKeep" class="ghost" type="button">Keep my slot</button><button id="askGo" type="button">Release slot</button></div>
+  </div>
+</div>
+<div id="rel" class="ov" hidden>
+  <div class="dlg" role="dialog" aria-modal="true" aria-labelledby="relT">
+    <div class="tick open" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 7.5-2"/></svg></div>
+    <p class="mine-slot" id="relSlot"></p>
+    <h2 id="relT">Slot released</h2>
+    <p class="follow">This slot is now open for anyone to book.</p>
+    <p class="follow">If you change your mind, you can sign up again, as long as nobody has taken it first.</p>
+    <button id="relOk" type="button">Got it</button>
+  </div>
+</div>
 <div id="done" class="ov" hidden>
   <div class="dlg" role="dialog" aria-modal="true" aria-labelledby="doneT">
     <div class="tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
@@ -217,26 +241,38 @@ async function refresh(){
   render();
 }
 
-let doneFrom=null;
 function slotLine(id){
   const x=SLOTS.find(s=>s.id===id);
   return x?x.campus+" · "+x.date+" · "+x.role+(x.time?", "+x.time:""):"";
 }
-function showDone(id){
-  doneFrom=document.activeElement;
-  $("doneSlot").textContent=slotLine(id);$("doneSlot").hidden=!$("doneSlot").textContent;
-  $("done").hidden=false;$("doneOk").focus();
+// pop-ups: one open at a time; Esc, a tap outside or the close button dismisses
+let curOv=null,ovFrom=null,ovCb=null;
+function openOv(id,focusId,cb,slotId,slotEl){
+  curOv=$(id);ovFrom=document.activeElement;ovCb=cb||null;
+  if(slotEl){$(slotEl).textContent=slotLine(slotId);$(slotEl).hidden=!$(slotEl).textContent}
+  curOv.hidden=false;$(focusId).focus();
 }
-function closeDone(){
-  if($("done").hidden)return;$("done").hidden=true;
-  try{doneFrom&&doneFrom.isConnected&&doneFrom.focus()}catch(e){}
+function closeOv(val){
+  if(!curOv)return;
+  curOv.hidden=true;const cb=ovCb;curOv=null;ovCb=null;
+  try{ovFrom&&ovFrom.isConnected&&ovFrom.focus()}catch(e){}
+  if(cb)cb(val);
 }
-$("doneOk").onclick=closeDone;
-$("done").addEventListener("click",e=>{if(e.target===$("done"))closeDone()});
+const showDone=id=>openOv("done","doneOk",null,id,"doneSlot");
+const askRelease=id=>new Promise(res=>openOv("ask","askKeep",res,id,"askSlot"));
+const showReleased=id=>openOv("rel","relOk",null,id,"relSlot");
+$("doneOk").onclick=()=>closeOv(true);
+$("relOk").onclick=()=>closeOv(true);
+$("askKeep").onclick=()=>closeOv(false);
+$("askGo").onclick=()=>closeOv(true);
+document.querySelectorAll(".ov").forEach(o=>o.addEventListener("click",e=>{if(e.target===o)closeOv(false)}));
 document.addEventListener("keydown",e=>{
-  if($("done").hidden)return;
-  if(e.key==="Escape"){e.preventDefault();closeDone()}
-  else if(e.key==="Tab"){e.preventDefault();$("doneOk").focus()}   // keep focus inside the pop-up
+  if(!curOv)return;
+  if(e.key==="Escape"){e.preventDefault();closeOv(false)}
+  else if(e.key==="Tab"){
+    const f=[...curOv.querySelectorAll("button")],i=f.indexOf(document.activeElement);
+    e.preventDefault();f[(i+(e.shiftKey?f.length-1:1))%f.length].focus();   // keep focus inside the pop-up
+  }
 });
 async function claim(id){
   const name=nm.value.trim();
@@ -251,10 +287,12 @@ async function claim(id){
   finally{busy=false;refresh()}
 }
 async function release(id){
-  if(busy||!confirm("Release this slot so someone else can take it?"))return;busy=true;
+  if(busy)return;
+  if(!(await askRelease(id)))return;
+  busy=true;
   try{
     const {status}=await api("release",{method:"POST",body:JSON.stringify({id})});
-    toast(status===200?"Slot released":"Couldn't release the slot.");
+    if(status===200)showReleased(id);else toast("Couldn't release the slot.");
   }catch(e){toast("Couldn't release. Check your connection.")}
   finally{busy=false;refresh()}
 }
